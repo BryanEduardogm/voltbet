@@ -1368,6 +1368,39 @@ button {
    -------------------------------------------------------------------------- */
 
 /* ---- CELULAR: cupom vira barra fixa no rodapé que expande ---- */
+/* ---- CELULAR ---- */
+@media (max-width: 720px) {
+  /* Numa linha só o topo não cabe: logo, quatro links, saldo, botão e avatar
+     estouravam a largura da tela e ficavam cortados. Aqui ele vira duas linhas,
+     com a navegação embaixo, rolando na horizontal. */
+  .cabecalho__interno {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px 14px;
+  }
+
+  .nav-principal {
+    order: 3;
+    width: 100%;
+    margin-left: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav-principal::-webkit-scrollbar { display: none; }
+  .nav-principal ul { width: max-content; gap: 2px; }
+  .nav-principal a { padding: 6px 10px; font-size: 0.85rem; }
+
+  .cabecalho__conta { margin-left: auto; gap: 8px; }
+
+  /* o saldo pode ser um número longo: encolhe para sobrar espaço */
+  .saldo { padding: 4px 10px; }
+  .saldo__rotulo { display: none; }
+  .saldo__valor { font-size: 0.9rem; }
+
+  .btn--pequeno { padding: 6px 10px; font-size: 0.78rem; }
+  .logo__texto { font-size: 1.1rem; }
+}
+
 @media (max-width: 1023px) {
   .cupom {
     position: fixed;

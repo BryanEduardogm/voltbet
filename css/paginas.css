@@ -1,0 +1,1001 @@
+/* ==========================================================================
+   VOLTBET — painel de perfil, jogo do Aviator e página de recarga
+
+   Complementa o style.css (que traz as variáveis de cor, a base e a página
+   inicial). Este arquivo cuida só das partes novas:
+     1) painel de perfil (gaveta lateral)
+     2) jogo do Aviator (modal jogável, com saldo fictício de verdade)
+     3) página de recarga de saldo
+
+   Depende das variáveis definidas em style.css — carregue-o depois.
+   ========================================================================== */
+
+/* ==========================================================================
+   1. PAINEL DE PERFIL
+   ========================================================================== */
+
+/* Botão do avatar, no cabeçalho */
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--neon-borda);
+  background: linear-gradient(135deg, rgba(0, 255, 136, 0.18), rgba(0, 217, 163, 0.06));
+  transition: all var(--transicao);
+}
+.avatar:hover {
+  border-color: var(--neon);
+  box-shadow: var(--brilho-neon);
+}
+.avatar__iniciais {
+  font-family: var(--fonte-titulo);
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--neon);
+}
+.avatar--grande {
+  width: 58px;
+  height: 58px;
+  border: 2px solid var(--neon-borda);
+}
+.avatar--grande .avatar__iniciais { font-size: 1.3rem; }
+
+/* Escurece a página atrás do painel */
+.fundo-escuro {
+  position: fixed;
+  inset: 0;
+  z-index: 190;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  visibility: hidden;
+  /*
+    visibility é uma propriedade DISCRETA: se receber uma duração, ela vira
+    no meio da transição. O certo é duração zero, com atraso só ao esconder
+    — assim o desaparecimento espera o fade terminar, e o aparecimento é
+    instantâneo.
+  */
+  transition: opacity var(--transicao), visibility 0s linear 180ms;
+}
+.fundo-escuro.visivel {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity var(--transicao), visibility 0s;
+}
+
+/* Trava a rolagem do fundo enquanto o painel está aberto */
+.sem-rolagem { overflow: hidden; }
+
+.painel-perfil {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 200;
+  width: min(380px, 100vw);
+  display: flex;
+  flex-direction: column;
+  background: var(--fundo-elevado);
+  border-left: 1px solid var(--neon-borda);
+  box-shadow: -20px 0 60px rgba(0, 0, 0, 0.6);
+  /* Fica fora da tela até abrir. visibility impede que o teclado
+     alcance o conteúdo escondido. */
+  transform: translateX(100%);
+  visibility: hidden;
+  /* Mesma regra do fundo escuro: visibility com duração zero, atrasada só
+     no fechamento, para o painel não sumir antes de terminar de deslizar. */
+  transition: transform 260ms cubic-bezier(0.2, 0.8, 0.3, 1),
+              visibility 0s linear 260ms;
+}
+.painel-perfil.aberto {
+  transform: translateX(0);
+  visibility: visible;
+  transition: transform 260ms cubic-bezier(0.2, 0.8, 0.3, 1),
+              visibility 0s;
+}
+
+.painel-perfil__topo {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 20px;
+  border-bottom: 1px solid var(--borda);
+  background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), transparent 70%);
+}
+.painel-perfil__identidade {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+}
+.painel-perfil__nome {
+  font-size: 1.3rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.painel-perfil__conta {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.74rem;
+  color: var(--texto-apagado);
+  letter-spacing: 0.04em;
+}
+.painel-perfil__fechar {
+  margin-left: auto;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border: 1px solid var(--borda-forte);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--texto-suave);
+  font-size: 1.4rem;
+  line-height: 1;
+  transition: all var(--transicao);
+}
+.painel-perfil__fechar:hover {
+  border-color: var(--vermelho);
+  color: var(--vermelho);
+  background: var(--vermelho-fraco);
+}
+
+.painel-perfil__corpo {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px 20px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.painel-bloco {
+  padding: 16px;
+  border-radius: var(--raio);
+  border: 1px solid var(--borda);
+  background: var(--fundo-cartao);
+}
+.painel-bloco--saldo {
+  border-color: var(--neon-borda);
+  background:
+    linear-gradient(160deg, rgba(0, 255, 136, 0.09), transparent 60%),
+    var(--fundo-cartao);
+  text-align: center;
+}
+.painel-bloco__rotulo {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--texto-apagado);
+}
+.painel-bloco__saldo {
+  display: block;
+  margin: 4px 0 14px;
+  font-family: var(--fonte-titulo);
+  font-size: 2.3rem;
+  font-weight: 800;
+  color: var(--neon);
+  text-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+  font-variant-numeric: tabular-nums;
+}
+.painel-bloco__titulo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 1.02rem;
+  text-transform: uppercase;
+  margin-bottom: 13px;
+}
+.painel-bloco__nota {
+  margin-top: 10px;
+  font-size: 0.76rem;
+  line-height: 1.6;
+  color: var(--texto-apagado);
+}
+
+.etiqueta-mini {
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--neon-borda);
+  background: var(--neon-fraco);
+  color: var(--neon-suave);
+  font-family: var(--fonte-texto);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Grade de estatísticas do perfil */
+.estatisticas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+  margin: 0;
+}
+.estatistica {
+  padding: 10px 12px;
+  border-radius: var(--raio-pequeno);
+  background: var(--fundo-base);
+  border: 1px solid var(--borda);
+}
+.estatistica dt {
+  font-size: 0.7rem;
+  color: var(--texto-apagado);
+  margin-bottom: 3px;
+}
+.estatistica dd {
+  margin: 0;
+  font-family: var(--fonte-titulo);
+  font-size: 1.2rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.estatistica--verde { color: var(--neon); }
+
+/* Barra de progresso do limite mensal */
+.barra {
+  height: 9px;
+  border-radius: 999px;
+  background: var(--fundo-base);
+  border: 1px solid var(--borda);
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.barra__preenchimento {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--neon-suave), var(--neon));
+  box-shadow: var(--brilho-neon);
+  transition: width 320ms ease;
+}
+/* Limite estourado: deixa de ser verde, porque não é mais coisa boa */
+.barra__preenchimento--cheia {
+  background: linear-gradient(90deg, #b45309, var(--vermelho));
+  box-shadow: 0 0 12px rgba(255, 77, 109, 0.5);
+}
+
+.lista-dados {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin: 0;
+}
+.lista-dados li,
+.lista-dados > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.84rem;
+  color: var(--texto-suave);
+}
+.lista-dados strong,
+.lista-dados dd {
+  margin: 0;
+  color: var(--texto);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+.lista-dados dt { color: var(--texto-suave); }
+.lista-dados--bloco {
+  padding: 13px 15px;
+  margin-bottom: 14px;
+  border-radius: var(--raio-pequeno);
+  background: var(--fundo-base);
+  border: 1px solid var(--borda);
+}
+
+/* Estado de confirmação do botão "Zerar demonstração" */
+.btn--perigo {
+  border-color: var(--vermelho);
+  color: var(--vermelho);
+  background: var(--vermelho-fraco);
+}
+
+/* ==========================================================================
+   2. JOGO — AVIATOR (demonstração jogável)
+   ========================================================================== */
+
+.modal-jogo {
+  position: fixed;
+  inset: 0;
+  z-index: 210;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-jogo[hidden] { display: none; }
+
+.modal-jogo__caixa {
+  width: min(440px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: var(--raio);
+  border: 1px solid var(--neon-borda);
+  background: var(--fundo-elevado);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.65);
+  animation: modal-jogo-entrar 220ms cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+@keyframes modal-jogo-entrar {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-jogo__topo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--borda);
+  background: linear-gradient(135deg, rgba(255, 77, 109, 0.12), transparent 70%);
+}
+.modal-jogo__titulo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+.modal-jogo__fechar {
+  margin-left: auto;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border: 1px solid var(--borda-forte);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--texto-suave);
+  font-size: 1.4rem;
+  line-height: 1;
+  transition: all var(--transicao);
+}
+.modal-jogo__fechar:hover {
+  border-color: var(--vermelho);
+  color: var(--vermelho);
+  background: var(--vermelho-fraco);
+}
+
+.aviator-jogo,
+.jogo-corpo {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+}
+
+/* Classes genéricas reaproveitadas pelos outros jogos do cassino (slots,
+   Mines, Plinko, Roleta) — mesmo visual dos controles do Aviator, sem
+   depender do nome dele. */
+.jogo-status {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--texto-suave);
+  text-align: center;
+  padding: 0 16px;
+}
+.jogo-controles {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.jogo-tela {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 200px;
+  border-radius: var(--raio);
+  overflow: hidden;
+  border: 1px solid var(--borda);
+  padding: 14px;
+}
+
+.aviator-jogo__tela {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 200px;
+  border-radius: var(--raio);
+  overflow: hidden;
+  background:
+    radial-gradient(120% 100% at 50% 100%, rgba(255, 77, 109, 0.25), transparent 60%),
+    linear-gradient(180deg, #12060a, #05070a);
+  border: 1px solid var(--borda);
+}
+
+/* Gráfico da curva de voo, atrás do número do multiplicador */
+.aviator-jogo__grafico {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.aviator-jogo__curva {
+  fill: none;
+  stroke: var(--neon);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 0 6px rgba(0, 255, 136, 0.65));
+  transition: stroke var(--transicao);
+}
+.aviator-jogo__curva--caiu {
+  stroke: var(--vermelho);
+  filter: drop-shadow(0 0 6px rgba(255, 77, 109, 0.6));
+}
+
+.aviator-jogo__aviao {
+  position: absolute;
+  left: 0%;
+  bottom: 0%;
+  font-size: 1.35rem;
+  line-height: 1;
+  transform: translate(-50%, 50%) rotate(-45deg);
+  transition: left 120ms linear, bottom 120ms linear, transform 220ms ease;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5));
+}
+.aviator-jogo__aviao--caiu {
+  transform: translate(-50%, 50%) rotate(115deg) scale(0.9);
+  opacity: 0;
+  transition: left 120ms linear, bottom 120ms linear, transform 700ms ease-in, opacity 700ms ease-in;
+}
+
+.aviator-jogo__multiplicador {
+  font-family: var(--fonte-titulo);
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--texto);
+  font-variant-numeric: tabular-nums;
+  transition: color var(--transicao), text-shadow var(--transicao);
+}
+.aviator-jogo__multiplicador--subindo { color: var(--neon); text-shadow: 0 0 24px rgba(0, 255, 136, 0.5); }
+.aviator-jogo__multiplicador--caiu    { color: var(--vermelho); text-shadow: 0 0 24px rgba(255, 77, 109, 0.55); }
+
+.aviator-jogo__status {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--texto-suave);
+  text-align: center;
+  padding: 0 16px;
+}
+
+.aviator-jogo__historico {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.aviator-jogo__historico li {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  background: var(--fundo-cartao-2);
+  color: var(--texto-suave);
+}
+.aviator-jogo__historico li.subiu { color: var(--neon); background: var(--neon-fraco); }
+.aviator-jogo__historico li.caiu  { color: var(--vermelho); background: var(--vermelho-fraco); }
+
+.aviator-jogo__controles {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.aviator-jogo__retirar {
+  animation: aviator-retirar-pulsar 1.1s ease-in-out infinite;
+}
+@keyframes aviator-retirar-pulsar {
+  0%, 100% { box-shadow: var(--brilho-neon); }
+  50%      { box-shadow: var(--brilho-forte); }
+}
+
+/* ==========================================================================
+   2b. OUTROS JOGOS DO CASSINO (slot, Mines, Plinko, Roleta)
+   ========================================================================== */
+
+/* ---------- Slot (Fortune Tiger / Ox / Rabbit / Sweet Bonanza) ---------- */
+.slot-jogo__tela {
+  background: linear-gradient(180deg, #1a1206, #05070a);
+}
+.slot-jogo__rolos {
+  display: flex;
+  gap: 10px;
+}
+.slot-jogo__rolo {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: var(--raio-pequeno);
+  border: 1px solid var(--borda-forte);
+  background: var(--fundo-cartao-2);
+  font-size: 2.4rem;
+  transition: transform 90ms ease;
+}
+.slot-jogo__rolo.girando { animation: slot-girando 90ms linear infinite; }
+@keyframes slot-girando {
+  0%   { transform: translateY(-6px); }
+  50%  { transform: translateY(6px); }
+  100% { transform: translateY(-6px); }
+}
+.slot-jogo__rolo.ganhou {
+  border-color: var(--neon);
+  box-shadow: var(--brilho-neon);
+}
+
+/* ---------- Mines ---------- */
+.mines-jogo__tela {
+  background: linear-gradient(180deg, #0b1f16, #05070a);
+  padding: 16px;
+}
+.mines-jogo__grade {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 7px;
+  width: 100%;
+  max-width: 260px;
+}
+.mines-jogo__casa {
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border-radius: 7px;
+  border: 1px solid var(--borda-forte);
+  background: var(--fundo-cartao-2);
+  font-size: 1.1rem;
+  transition: all var(--transicao);
+}
+.mines-jogo__casa:not(:disabled):hover {
+  border-color: var(--neon);
+  background: var(--neon-fraco);
+}
+.mines-jogo__casa:disabled { cursor: default; }
+.mines-jogo__casa.revelada--gema {
+  border-color: var(--neon);
+  background: var(--neon-fraco);
+}
+.mines-jogo__casa.revelada--bomba {
+  border-color: var(--vermelho);
+  background: var(--vermelho-fraco);
+}
+
+/* ---------- Plinko ---------- */
+.plinko-jogo__tela {
+  background: linear-gradient(180deg, #06101f, #05070a);
+  padding-top: 18px;
+}
+.plinko-jogo__pinos {
+  display: grid;
+  gap: 14px;
+  width: 100%;
+  max-width: 260px;
+}
+.plinko-jogo__linha {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+.plinko-jogo__pino {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--texto-apagado);
+}
+.plinko-jogo__bolinha {
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--neon);
+  box-shadow: var(--brilho-neon);
+  transform: translateX(-50%);
+  transition: left 130ms ease-in, top 130ms ease-in;
+  opacity: 0;
+}
+.plinko-jogo__bolinha.visivel { opacity: 1; }
+.plinko-jogo__slots {
+  display: flex;
+  gap: 3px;
+  width: 100%;
+  max-width: 260px;
+}
+.plinko-jogo__slot {
+  flex: 1;
+  padding: 5px 2px;
+  border-radius: 5px;
+  text-align: center;
+  font-size: 0.66rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  background: var(--fundo-cartao-2);
+  color: var(--texto-suave);
+  transition: all var(--transicao);
+}
+.plinko-jogo__slot.ativo {
+  background: var(--neon);
+  color: #04120b;
+  transform: scale(1.15);
+  box-shadow: var(--brilho-neon);
+}
+
+/* ---------- Roleta Brasileira ---------- */
+.roleta-jogo__tela {
+  background: linear-gradient(180deg, #0b1f16, #05070a);
+}
+.roleta-jogo__janela {
+  position: relative;
+  width: 100%;
+  max-width: 280px;
+  height: 56px;
+  overflow: hidden;
+  border-radius: var(--raio-pequeno);
+  border: 1px solid var(--borda-forte);
+  background: var(--fundo-cartao-2);
+}
+.roleta-jogo__janela::after {
+  /* Marcador central indicando o número vencedor */
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  background: var(--neon);
+  box-shadow: var(--brilho-neon);
+  transform: translateX(-50%);
+}
+.roleta-jogo__faixa {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  display: flex;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  transition: left 1.7s cubic-bezier(0.1, 0.7, 0.1, 1);
+}
+.roleta-jogo__faixa li {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 100%;
+  flex-shrink: 0;
+  font-family: var(--fonte-titulo);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+.roleta-jogo__faixa li.vermelho { background: #7a0d1c; }
+.roleta-jogo__faixa li.preto    { background: #16181c; }
+.roleta-jogo__faixa li.verde    { background: #0b6d3a; }
+
+.roleta-jogo__cores {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+.roleta-jogo__cor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 4px;
+  border-radius: var(--raio-pequeno);
+  border: 1px solid var(--borda-forte);
+  background: var(--fundo-cartao-2);
+  color: var(--texto);
+  font-size: 0.8rem;
+  font-weight: 700;
+  transition: all var(--transicao);
+}
+.roleta-jogo__cor span { font-size: 0.68rem; color: var(--texto-apagado); font-weight: 600; }
+.roleta-jogo__cor--vermelho.selecionada { border-color: #ff4d6d; background: rgba(255, 77, 109, 0.18); }
+.roleta-jogo__cor--preto.selecionada    { border-color: #9aa4af; background: rgba(154, 164, 175, 0.18); }
+.roleta-jogo__cor--verde.selecionada    { border-color: var(--neon); background: var(--neon-fraco); }
+
+/* ==========================================================================
+   3. PÁGINA DE RECARGA
+   ========================================================================== */
+
+.pagina {
+  max-width: var(--largura-maxima);
+  margin: 0 auto;
+  padding: 26px 20px 60px;
+}
+
+.migalhas {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 18px;
+  font-size: 0.82rem;
+  color: var(--texto-apagado);
+}
+.migalhas a { color: var(--neon-suave); }
+.migalhas a:hover { text-decoration: underline; }
+
+.pagina__titulo {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 800;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.pagina__descricao {
+  max-width: 62ch;
+  margin-bottom: 30px;
+  color: var(--texto-suave);
+}
+
+.recarga {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  margin-bottom: 50px;
+}
+.recarga__principal {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+.cartao {
+  padding: 20px;
+  border-radius: var(--raio);
+  border: 1px solid var(--borda);
+  background: var(--fundo-cartao);
+}
+.cartao__titulo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.25rem;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.cartao__nota {
+  margin-top: 11px;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  color: var(--texto-apagado);
+}
+.cartao__erro {
+  margin-bottom: 12px;
+  padding: 10px 13px;
+  border-radius: var(--raio-pequeno);
+  background: var(--vermelho-fraco);
+  border: 1px solid rgba(255, 77, 109, 0.4);
+  color: var(--vermelho);
+  font-size: 0.83rem;
+}
+
+/* Numerozinho do passo (1, 2) */
+.passo {
+  display: grid;
+  place-items: center;
+  width: 27px;
+  height: 27px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--neon);
+  color: #04120b;
+  font-family: var(--fonte-texto);
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+/* Chips de valor rápido */
+.valores-rapidos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(84px, 1fr));
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.valor-chip {
+  min-height: 46px;
+  padding: 10px 6px;
+  border-radius: var(--raio-pequeno);
+  border: 1px solid var(--borda-forte);
+  background: var(--fundo-base);
+  color: var(--texto-suave);
+  font-family: var(--fonte-titulo);
+  font-size: 1.1rem;
+  font-weight: 700;
+  transition: all var(--transicao);
+}
+.valor-chip:hover {
+  border-color: var(--neon);
+  color: var(--neon);
+  background: var(--neon-fraco);
+}
+.valor-chip.ativo {
+  background: linear-gradient(135deg, var(--neon), var(--neon-suave));
+  border-color: var(--neon);
+  color: #04120b;
+  box-shadow: var(--brilho-neon);
+}
+
+/* Variações do campo de entrada herdado do style.css */
+.campo__entrada--normal {
+  font-family: var(--fonte-texto);
+  font-size: 0.98rem;
+  font-weight: 500;
+}
+.campo__entrada--codigo {
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  font-size: 0.76rem;
+  font-weight: 400;
+  line-height: 1.6;
+  resize: vertical;
+  word-break: break-all;
+}
+
+/* Abas de método de pagamento */
+.abas {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.aba {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 82px;
+  padding: 11px 6px;
+  border-radius: var(--raio-pequeno);
+  border: 1px solid var(--borda-forte);
+  background: var(--fundo-base);
+  color: var(--texto-suave);
+  font-size: 0.86rem;
+  font-weight: 600;
+  transition: all var(--transicao);
+}
+.aba:hover {
+  border-color: var(--neon-borda);
+  color: var(--neon);
+}
+.aba.ativa {
+  border-color: var(--neon);
+  background: var(--neon-fraco);
+  color: var(--neon);
+  box-shadow: var(--brilho-neon);
+}
+.aba__icone { display: block; line-height: 0; }
+.aba__selo {
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--neon-fraco);
+  border: 1px solid var(--neon-borda);
+  color: var(--neon-suave);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.aba__selo--lento {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--borda-forte);
+  color: var(--texto-apagado);
+}
+
+/* PIX */
+.pix {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  align-items: start;
+}
+.pix__qr {
+  display: grid;
+  place-items: center;
+  padding: 13px;
+  border-radius: var(--raio);
+  background: #e6f2ec;
+  border: 1px solid var(--neon-borda);
+  box-shadow: var(--brilho-neon);
+  justify-self: center;
+}
+.pix__instrucao {
+  margin-bottom: 14px;
+  font-size: 0.9rem;
+  color: var(--texto-suave);
+}
+
+/* Caixas de aviso */
+.alerta {
+  padding: 13px 15px;
+  margin-bottom: 16px;
+  border-radius: var(--raio-pequeno);
+  border-left: 3px solid var(--neon-suave);
+  background: rgba(255, 255, 255, 0.03);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--texto-suave);
+}
+/* Âmbar de propósito: é o aviso de não digitar cartão real, e precisa
+   destoar do verde do resto do site para não passar batido. */
+.alerta--atencao {
+  border-left-color: #f5a623;
+  background: rgba(245, 166, 35, 0.09);
+  color: #f7c46c;
+}
+.alerta--atencao strong { color: #ffd88a; }
+
+/* Formulário de cartão */
+.form-cartao { margin-top: 16px; }
+.form-cartao__linha {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* Resumo lateral */
+.resumo-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 14px 15px;
+  margin-bottom: 14px;
+  border-radius: var(--raio-pequeno);
+  border: 1px solid var(--neon-borda);
+  background: var(--neon-fraco);
+  font-size: 0.85rem;
+  color: var(--texto-suave);
+}
+.resumo-total strong {
+  font-family: var(--fonte-titulo);
+  font-size: 1.55rem;
+  color: var(--neon);
+  text-shadow: 0 0 14px rgba(0, 255, 136, 0.4);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Telas maiores ---------- */
+
+@media (min-width: 700px) {
+  .pix { grid-template-columns: auto 1fr; }
+  .pix__qr { justify-self: start; }
+}
+
+@media (min-width: 1024px) {
+  .recarga {
+    grid-template-columns: minmax(0, 1fr) 340px;
+    align-items: start;
+  }
+  .cartao--fixo {
+    position: sticky;
+    top: calc(var(--altura-cabecalho) + 16px);
+  }
+}

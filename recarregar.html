@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Recarga de saldo fictício do VOLTBET — demonstração de portfólio com PIX, cartão e boleto simulados. Nenhum pagamento real é processado.">
+  <meta name="theme-color" content="#05070a">
+  <title>Recarregar saldo — VOLTBET (demonstração)</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2305070a'/%3E%3Cpath d='M18 4 L8 18 h6 l-2 10 10-14 h-6 z' fill='%2300ff88'/%3E%3C/svg%3E">
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/paginas.css">
+</head>
+<body>
+
+  <a class="pular-para-conteudo" href="#conteudo">Pular para o conteúdo</a>
+
+  <canvas id="fundo-animado" class="fundo-animado" aria-hidden="true"></canvas>
+
+  <!-- ================== FAIXA DE AVISO ================== -->
+  <div class="faixa-demo" role="note">
+    <span class="faixa-demo__selo">DEMO</span>
+    <p>
+      Nenhum pagamento é processado. Os métodos abaixo são
+      <strong>simulações visuais</strong> e o saldo creditado é
+      <strong>fictício</strong>.
+    </p>
+  </div>
+
+  <!-- ================== CABEÇALHO ================== -->
+  <header class="cabecalho">
+    <div class="cabecalho__interno">
+
+      <a class="logo" href="index.html" aria-label="VOLTBET, página inicial">
+        <svg class="logo__raio" viewBox="0 0 32 32" width="28" height="28" aria-hidden="true" focusable="false">
+          <path d="M18 4 L8 18 h6 l-2 10 10-14 h-6 z" fill="currentColor"/>
+        </svg>
+        <span class="logo__texto">VOLT<span class="logo__destaque">BET</span></span>
+      </a>
+
+      <nav class="nav-principal" aria-label="Navegação principal">
+        <ul>
+          <li><a href="index.html#ao-vivo">Ao vivo</a></li>
+          <li><a href="index.html#futebol">Esportes</a></li>
+          <li><a href="index.html#historico">Minhas apostas</a></li>
+        </ul>
+      </nav>
+
+      <div class="cabecalho__conta">
+        <div class="saldo">
+          <span class="saldo__rotulo">Saldo</span>
+          <strong class="saldo__valor" id="saldo-valor" aria-live="polite">R$&nbsp;500,00</strong>
+        </div>
+
+        <button class="avatar" type="button" id="btn-perfil"
+                aria-expanded="false" aria-controls="painel-perfil"
+                aria-label="Abrir painel de perfil">
+          <span class="avatar__iniciais" aria-hidden="true">BG</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ================== CONTEÚDO ================== -->
+  <main class="pagina" id="conteudo">
+
+    <nav class="migalhas" aria-label="Você está aqui">
+      <a href="index.html">Início</a>
+      <span aria-hidden="true">›</span>
+      <span aria-current="page">Recarregar saldo</span>
+    </nav>
+
+    <h1 class="pagina__titulo">RECARREGAR <span class="brilho-verde">SALDO</span></h1>
+    <p class="pagina__descricao">
+      Escolha um valor e um método. Como é uma demonstração, o crédito cai na
+      hora — sem cobrança, sem cadastro e sem enviar dado nenhum para fora
+      deste navegador.
+    </p>
+
+    <div class="recarga">
+
+      <!-- ---------- COLUNA 1: valor + métodos ---------- -->
+      <div class="recarga__principal">
+
+        <!-- Passo 1: valor -->
+        <section class="cartao" aria-labelledby="titulo-valor">
+          <h2 class="cartao__titulo" id="titulo-valor">
+            <span class="passo">1</span> Quanto quer depositar?
+          </h2>
+
+          <div class="valores-rapidos" role="group" aria-label="Valores sugeridos">
+            <button class="valor-chip" type="button" data-valor="20">R$ 20</button>
+            <button class="valor-chip" type="button" data-valor="50">R$ 50</button>
+            <button class="valor-chip ativo" type="button" data-valor="100">R$ 100</button>
+            <button class="valor-chip" type="button" data-valor="200">R$ 200</button>
+            <button class="valor-chip" type="button" data-valor="500">R$ 500</button>
+          </div>
+
+          <label class="campo" for="valor-deposito">
+            <span class="campo__rotulo">Ou digite outro valor (R$)</span>
+            <input class="campo__entrada" type="number" id="valor-deposito"
+                   min="10" step="10" value="100"
+                   inputmode="decimal" autocomplete="off">
+          </label>
+
+          <p class="cartao__nota" id="aviso-limite">
+            Depósito mínimo de R$ 10. Limite mensal de
+            <strong id="texto-limite">R$ 2.000,00</strong>.
+          </p>
+        </section>
+
+        <!-- Passo 2: método -->
+        <section class="cartao" aria-labelledby="titulo-metodo">
+          <h2 class="cartao__titulo" id="titulo-metodo">
+            <span class="passo">2</span> Como quer pagar?
+          </h2>
+
+          <!-- Abas -->
+          <div class="abas" role="tablist" aria-label="Métodos de pagamento">
+            <button class="aba ativa" type="button" role="tab" id="aba-pix"
+                    aria-selected="true" aria-controls="painel-pix" data-metodo="pix">
+              <span class="aba__icone" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="20" height="20">
+                  <path d="M12 2.6 21.4 12 12 21.4 2.6 12z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                </svg>
+              </span>
+              PIX
+              <span class="aba__selo">Na hora</span>
+            </button>
+
+            <button class="aba" type="button" role="tab" id="aba-cartao"
+                    aria-selected="false" aria-controls="painel-cartao" data-metodo="cartão">
+              <span class="aba__icone" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="20" height="20">
+                  <rect x="2" y="5" width="20" height="14" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/>
+                  <path d="M2 10h20" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </span>
+              Crédito
+            </button>
+
+            <button class="aba" type="button" role="tab" id="aba-boleto"
+                    aria-selected="false" aria-controls="painel-boleto" data-metodo="boleto">
+              <span class="aba__icone" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="20" height="20">
+                  <path d="M3 5v14M6.5 5v14M9 5v14M12.5 5v14M15 5v14M18.5 5v14M21 5v14"
+                        stroke="currentColor" stroke-width="1.6"/>
+                </svg>
+              </span>
+              Boleto
+              <span class="aba__selo aba__selo--lento">1–3 dias</span>
+            </button>
+          </div>
+
+          <!-- ===== PIX ===== -->
+          <div class="painel-aba" id="painel-pix" role="tabpanel" aria-labelledby="aba-pix">
+
+            <div class="pix">
+              <!-- "QR Code" desenhado em SVG: é decorativo e não leva a lugar nenhum -->
+              <div class="pix__qr" aria-hidden="true">
+                <svg viewBox="0 0 29 29" width="150" height="150" shape-rendering="crispEdges">
+                  <rect width="29" height="29" fill="#e6f2ec"/>
+                  <g fill="#05070a">
+                    <path d="M1 1h7v7h-7z M2 2h5v5h-5z M3 3h3v3h-3z"/>
+                    <path d="M21 1h7v7h-7z M22 2h5v5h-5z M23 3h3v3h-3z"/>
+                    <path d="M1 21h7v7h-7z M2 22h5v5h-5z M3 23h3v3h-3z"/>
+                    <path d="M10 1h1v1h-1z M12 1h1v2h-1z M14 2h1v1h-1z M16 1h1v1h-1z M18 2h1v1h-1z"/>
+                    <path d="M10 3h2v1h-2z M13 4h1v1h-1z M15 3h1v2h-1z M17 4h2v1h-2z"/>
+                    <path d="M10 6h1v2h-1z M12 6h2v1h-2z M15 7h1v1h-1z M17 6h1v2h-1z M19 7h1v1h-1z"/>
+                    <path d="M1 10h1v1h-1z M3 10h2v1h-2z M6 10h1v2h-1z M8 11h1v1h-1z"/>
+                    <path d="M2 12h1v1h-1z M4 12h1v2h-1z M7 13h1v1h-1z M1 14h2v1h-2z M5 15h1v1h-1z"/>
+                    <path d="M10 10h2v2h-2z M13 11h1v1h-1z M15 10h1v1h-1z M17 11h2v1h-2z M20 10h1v2h-1z"/>
+                    <path d="M11 13h1v2h-1z M14 13h2v1h-2z M18 14h1v1h-1z M21 13h1v1h-1z"/>
+                    <path d="M10 16h1v1h-1z M12 16h2v1h-2z M16 16h1v2h-1z M19 17h2v1h-2z"/>
+                    <path d="M23 10h1v2h-1z M25 11h2v1h-2z M22 13h2v1h-2z M26 14h1v1h-1z M24 15h1v1h-1z"/>
+                    <path d="M10 19h2v1h-2z M14 19h1v2h-1z M17 20h1v1h-1z M20 19h1v1h-1z M23 19h2v1h-2z M27 20h1v1h-1z"/>
+                    <path d="M10 22h1v2h-1z M12 23h2v1h-2z M15 22h1v1h-1z M18 23h1v2h-1z M21 22h1v2h-1z M24 23h1v1h-1z M26 22h1v2h-1z"/>
+                    <path d="M11 26h2v1h-2z M14 25h1v2h-1z M16 26h2v1h-2z M19 25h2v1h-2z M22 26h1v1h-1z M25 26h2v1h-2z"/>
+                  </g>
+                </svg>
+              </div>
+
+              <div class="pix__lado">
+                <p class="pix__instrucao">
+                  Abra o app do seu banco, escolha <strong>PIX Copia e Cola</strong>
+                  e use o código abaixo. O crédito cai em segundos.
+                </p>
+
+                <label class="campo" for="codigo-pix">
+                  <span class="campo__rotulo">Código copia e cola</span>
+                  <textarea class="campo__entrada campo__entrada--codigo" id="codigo-pix"
+                            rows="3" readonly></textarea>
+                </label>
+
+                <button class="btn btn--fantasma btn--largo" type="button" id="btn-copiar-pix">
+                  Copiar código
+                </button>
+
+                <p class="cartao__nota">
+                  Este código é <strong>fictício</strong> e não é reconhecido por
+                  banco nenhum. Serve só para demonstrar a tela.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== CARTÃO ===== -->
+          <div class="painel-aba" id="painel-cartao" role="tabpanel" aria-labelledby="aba-cartao" hidden>
+
+            <!--
+              AVISO IMPORTANTE: este formulário é uma simulação de interface.
+              Ele NÃO envia nada para lugar nenhum e NÃO guarda o número
+              digitado — nem no localStorage, nem em variável que sobreviva
+              ao envio. A validação é só de formato (algoritmo de Luhn).
+            -->
+            <div class="alerta alerta--atencao" role="note">
+              <strong>Não digite um cartão de verdade.</strong>
+              Esta tela é uma simulação de portfólio: nada é enviado nem
+              guardado. Use o cartão de teste para ver a validação funcionando.
+            </div>
+
+            <button class="btn btn--contorno btn--largo" type="button" id="btn-cartao-teste">
+              Preencher com cartão de teste
+            </button>
+
+            <div class="form-cartao">
+              <label class="campo" for="cartao-numero">
+                <span class="campo__rotulo">Número do cartão</span>
+                <input class="campo__entrada campo__entrada--normal" type="text" id="cartao-numero"
+                       inputmode="numeric" autocomplete="off" maxlength="19"
+                       placeholder="0000 0000 0000 0000">
+              </label>
+
+              <label class="campo" for="cartao-nome">
+                <span class="campo__rotulo">Nome impresso no cartão</span>
+                <input class="campo__entrada campo__entrada--normal" type="text" id="cartao-nome"
+                       autocomplete="off" placeholder="NOME COMO ESTÁ NO CARTÃO">
+              </label>
+
+              <div class="form-cartao__linha">
+                <label class="campo" for="cartao-validade">
+                  <span class="campo__rotulo">Validade</span>
+                  <input class="campo__entrada campo__entrada--normal" type="text" id="cartao-validade"
+                         inputmode="numeric" autocomplete="off" maxlength="5" placeholder="MM/AA">
+                </label>
+
+                <label class="campo" for="cartao-cvv">
+                  <span class="campo__rotulo">CVV</span>
+                  <input class="campo__entrada campo__entrada--normal" type="text" id="cartao-cvv"
+                         inputmode="numeric" autocomplete="off" maxlength="4" placeholder="000">
+                </label>
+              </div>
+
+              <label class="campo" for="cartao-parcelas">
+                <span class="campo__rotulo">Parcelas</span>
+                <select class="campo__entrada campo__entrada--normal" id="cartao-parcelas">
+                  <option value="1">1x sem juros</option>
+                  <option value="2">2x sem juros</option>
+                  <option value="3">3x sem juros</option>
+                </select>
+              </label>
+
+              <p class="cartao__nota" id="cartao-parcela-texto"></p>
+            </div>
+          </div>
+
+          <!-- ===== BOLETO ===== -->
+          <div class="painel-aba" id="painel-boleto" role="tabpanel" aria-labelledby="aba-boleto" hidden>
+
+            <div class="alerta" role="note">
+              No mundo real o boleto leva de <strong>1 a 3 dias úteis</strong>
+              para compensar. Aqui, o botão simula a compensação na hora.
+            </div>
+
+            <dl class="lista-dados lista-dados--bloco">
+              <div><dt>Vencimento</dt><dd id="boleto-vencimento">—</dd></div>
+              <div><dt>Beneficiário</dt><dd>VOLTBET Demonstrações Ltda.</dd></div>
+              <div><dt>Valor</dt><dd id="boleto-valor">R$&nbsp;100,00</dd></div>
+            </dl>
+
+            <label class="campo" for="linha-digitavel">
+              <span class="campo__rotulo">Linha digitável</span>
+              <textarea class="campo__entrada campo__entrada--codigo" id="linha-digitavel"
+                        rows="2" readonly></textarea>
+            </label>
+
+            <button class="btn btn--fantasma btn--largo" type="button" id="btn-copiar-boleto">
+              Copiar linha digitável
+            </button>
+
+            <p class="cartao__nota">
+              Número fictício, gerado só para preencher a tela. Não corresponde
+              a nenhum boleto real.
+            </p>
+          </div>
+
+        </section>
+      </div>
+
+      <!-- ---------- COLUNA 2: resumo ---------- -->
+      <aside class="recarga__resumo">
+        <div class="cartao cartao--fixo">
+          <h2 class="cartao__titulo">Resumo</h2>
+
+          <dl class="lista-dados lista-dados--bloco">
+            <div><dt>Saldo atual</dt><dd id="resumo-saldo-atual">R$&nbsp;500,00</dd></div>
+            <div><dt>Depósito</dt><dd id="resumo-deposito">R$&nbsp;100,00</dd></div>
+            <div><dt>Método</dt><dd id="resumo-metodo">PIX</dd></div>
+          </dl>
+
+          <div class="resumo-total">
+            <span>Saldo após o depósito</span>
+            <strong id="resumo-saldo-final">R$&nbsp;600,00</strong>
+          </div>
+
+          <p class="cartao__erro" id="recarga-erro" role="alert" hidden></p>
+
+          <button class="btn btn--principal btn--largo" type="button" id="btn-confirmar">
+            Confirmar depósito
+          </button>
+
+          <a class="btn btn--texto btn--largo" href="index.html">Voltar aos jogos</a>
+
+          <p class="cartao__nota">
+            <strong>18+.</strong> Deposite só o que puder perder. Apostas não
+            são fonte de renda.
+          </p>
+        </div>
+      </aside>
+
+    </div>
+
+    <!-- Últimos depósitos -->
+    <section class="secao" aria-labelledby="titulo-depositos">
+      <div class="secao__cabecalho">
+        <h2 class="secao__titulo" id="titulo-depositos">Últimos depósitos</h2>
+        <p class="secao__subtitulo">Guardados apenas neste navegador.</p>
+      </div>
+      <div class="historico" id="lista-depositos">
+        <p class="vazio" id="depositos-vazio">Nenhum depósito registrado ainda.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================== RODAPÉ ================== -->
+  <footer class="rodape">
+    <div class="rodape__interno">
+      <div class="rodape__responsavel" id="rodape-responsavel">
+        <span class="selo-18" aria-label="Proibido para menores de 18 anos">18+</span>
+        <div>
+          <h3>Jogo responsável</h3>
+          <p>
+            Apostas não são fonte de renda. Jogue apenas o que puder perder,
+            estabeleça limites de tempo e de valor, e nunca aposte para
+            recuperar prejuízo. Se o jogo deixou de ser diversão, procure ajuda:
+            <strong>Jogadores Anônimos — 0800 645 1010</strong> ou
+            <strong>CVV — 188</strong>.
+          </p>
+        </div>
+      </div>
+      <p class="rodape__creditos">
+        VOLTBET · Projeto fictício de portfólio · Desenvolvido por Bryan Eduardo Gouvea
+      </p>
+    </div>
+  </footer>
+
+  <!-- ================== PAINEL DE PERFIL ================== -->
+  <div class="fundo-escuro" id="fundo-perfil"></div>
+
+  <aside class="painel-perfil" id="painel-perfil" aria-labelledby="titulo-perfil">
+    <header class="painel-perfil__topo">
+      <div class="painel-perfil__identidade">
+        <span class="avatar avatar--grande" aria-hidden="true">
+          <span class="avatar__iniciais">BG</span>
+        </span>
+        <div>
+          <h2 class="painel-perfil__nome" id="titulo-perfil">Bryan Gouvea</h2>
+          <span class="painel-perfil__conta">Conta demo · VB-2026-0413</span>
+        </div>
+      </div>
+      <button class="painel-perfil__fechar" type="button" id="btn-fechar-perfil"
+              aria-label="Fechar painel de perfil">&times;</button>
+    </header>
+
+    <div class="painel-perfil__corpo">
+
+      <section class="painel-bloco painel-bloco--saldo">
+        <span class="painel-bloco__rotulo">Saldo disponível</span>
+        <strong class="painel-bloco__saldo" id="perfil-saldo">R$&nbsp;500,00</strong>
+        <a class="btn btn--principal btn--largo" href="index.html">Ir apostar</a>
+      </section>
+
+      <section class="painel-bloco">
+        <h3 class="painel-bloco__titulo">Minha atividade</h3>
+        <dl class="estatisticas">
+          <div class="estatistica"><dt>Apostas feitas</dt><dd id="perfil-apostas">0</dd></div>
+          <div class="estatistica"><dt>Total apostado</dt><dd id="perfil-total-apostado">R$&nbsp;0,00</dd></div>
+          <div class="estatistica"><dt>Retorno potencial</dt><dd class="estatistica--verde" id="perfil-retorno">R$&nbsp;0,00</dd></div>
+          <div class="estatistica"><dt>Maior odd</dt><dd id="perfil-maior-odd">—</dd></div>
+          <div class="estatistica"><dt>Múltiplas</dt><dd id="perfil-multiplas">0</dd></div>
+        </dl>
+      </section>
+
+      <section class="painel-bloco">
+        <h3 class="painel-bloco__titulo">
+          Limite mensal de depósito
+          <span class="etiqueta-mini">Jogo responsável</span>
+        </h3>
+        <div class="barra" role="progressbar" aria-label="Depositado no mês"
+             aria-valuemin="0" aria-valuenow="0" aria-valuemax="2000">
+          <span class="barra__preenchimento" id="perfil-barra"></span>
+        </div>
+        <ul class="lista-dados">
+          <li><span>Depositado no mês</span><strong id="perfil-depositado">R$&nbsp;0,00</strong></li>
+          <li><span>Teto mensal</span><strong id="perfil-limite">R$&nbsp;2.000,00</strong></li>
+          <li><span>Ainda disponível</span><strong id="perfil-restante">R$&nbsp;2.000,00</strong></li>
+        </ul>
+        <p class="painel-bloco__nota">
+          O limite existe para você decidir com a cabeça fria o quanto pode
+          gastar — antes de estar no calor do jogo.
+        </p>
+      </section>
+
+      <section class="painel-bloco">
+        <button class="btn btn--contorno btn--largo" type="button" id="btn-zerar">
+          Zerar demonstração
+        </button>
+        <p class="painel-bloco__nota">
+          Apaga saldo, apostas e depósitos guardados neste navegador e volta
+          tudo ao estado inicial.
+        </p>
+      </section>
+
+    </div>
+  </aside>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="js/comum.js" defer></script>
+  <script src="js/fundo.js" defer></script>
+  <script src="js/perfil.js" defer></script>
+  <script src="js/recarregar.js" defer></script>
+</body>
+</html>

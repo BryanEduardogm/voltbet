@@ -1,0 +1,1466 @@
+/* ==========================================================================
+   VOLTBET — folha de estilo principal
+   Tema: dark profundo + neon verde
+   Organização: 1) variáveis  2) base  3) componentes  4) responsivo
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. VARIÁVEIS
+   Todas as cores e medidas ficam aqui. Para mudar o tema inteiro do site,
+   basta alterar os valores abaixo.
+   -------------------------------------------------------------------------- */
+:root {
+  /* Fundos, do mais escuro ao mais claro */
+  --fundo-base:      #05070a;
+  --fundo-elevado:   #0a0e14;
+  --fundo-cartao:    #0f151d;
+  --fundo-cartao-2:  #141c26;
+
+  /* Verde neon — a cor da marca */
+  --neon:            #00ff88;
+  --neon-forte:      #39ff14;
+  --neon-suave:      #00d9a3;
+  --neon-fraco:      rgba(0, 255, 136, 0.12);
+  --neon-borda:      rgba(0, 255, 136, 0.28);
+
+  /* Vermelho, usado só quando uma odd cai */
+  --vermelho:        #ff4d6d;
+  --vermelho-fraco:  rgba(255, 77, 109, 0.14);
+
+  /* Texto */
+  --texto:           #e6f2ec;
+  --texto-suave:     #9fb3aa;
+  --texto-apagado:   #6b7f77;
+
+  /* Bordas e sombras */
+  --borda:           rgba(255, 255, 255, 0.07);
+  --borda-forte:     rgba(255, 255, 255, 0.14);
+  --brilho-neon:     0 0 12px rgba(0, 255, 136, 0.35);
+  --brilho-forte:    0 0 24px rgba(0, 255, 136, 0.5);
+
+  /* Medidas */
+  --raio:            14px;
+  --raio-pequeno:    9px;
+  --largura-maxima:  1320px;
+  --altura-cabecalho: 68px;
+  --transicao:       180ms ease;
+
+  /* Tipografia */
+  --fonte-titulo: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --fonte-texto:  "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+/* --------------------------------------------------------------------------
+   2. BASE
+   -------------------------------------------------------------------------- */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  /* Compensa o cabeçalho fixo quando se rola até uma âncora */
+  scroll-padding-top: calc(var(--altura-cabecalho) + 24px);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--fonte-texto);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--texto);
+  /* Gradiente de segurança: se o canvas do fundo animado não carregar,
+     a página continua escura e legível. */
+  background:
+    radial-gradient(1200px 700px at 80% -10%, rgba(0, 255, 136, 0.07), transparent 60%),
+    radial-gradient(900px 600px at 5% 15%, rgba(0, 217, 163, 0.05), transparent 55%),
+    var(--fundo-base);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  font-family: var(--fonte-titulo);
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+  margin: 0;
+}
+
+p { margin: 0; }
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* Foco sempre visível para quem navega por teclado */
+:focus-visible {
+  outline: 2px solid var(--neon);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Atalho "pular para o conteúdo": só aparece ao receber foco */
+.pular-para-conteudo {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 999;
+  padding: 12px 20px;
+  background: var(--neon);
+  color: #04120b;
+  font-weight: 700;
+  border-radius: 0 0 var(--raio-pequeno) 0;
+}
+.pular-para-conteudo:focus {
+  left: 0;
+}
+
+/* Fundo animado em canvas, atrás de tudo */
+.fundo-animado {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Detalhe recorrente: texto com brilho neon */
+.brilho-verde {
+  color: var(--neon);
+  text-shadow: 0 0 18px rgba(0, 255, 136, 0.45);
+}
+
+/* Bolinha pulsante que indica transmissão ao vivo */
+.ponto-live {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--vermelho);
+  box-shadow: 0 0 0 0 rgba(255, 77, 109, 0.7);
+  animation: pulsar 1.8s infinite;
+  vertical-align: middle;
+}
+
+@keyframes pulsar {
+  0%   { box-shadow: 0 0 0 0 rgba(255, 77, 109, 0.6); }
+  70%  { box-shadow: 0 0 0 8px rgba(255, 77, 109, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 77, 109, 0); }
+}
+
+/* --------------------------------------------------------------------------
+   3. COMPONENTES
+   -------------------------------------------------------------------------- */
+
+/* ---------- Botões ---------- */
+/* O atributo hidden tem a mesma especificidade de uma classe: sem isto aqui,
+   o display: inline-flex abaixo venceria e um botão "escondido" continuaria
+   aparecendo. */
+.btn[hidden] {
+  display: none;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 22px;
+  border: 1px solid transparent;
+  border-radius: var(--raio-pequeno);
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-align: center;
+  transition: transform var(--transicao), box-shadow var(--transicao),
+              background var(--transicao), border-color var(--transicao);
+}
+
+.btn--principal {
+  background: linear-gradient(135deg, var(--neon), var(--neon-suave));
+  color: #04120b;
+  box-shadow: var(--brilho-neon);
+}
+.btn--principal:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--brilho-forte);
+}
+
+.btn--contorno {
+  background: transparent;
+  border-color: var(--neon-borda);
+  color: var(--neon);
+}
+.btn--contorno:hover {
+  background: var(--neon-fraco);
+  border-color: var(--neon);
+}
+
+.btn--fantasma {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: var(--borda-forte);
+  color: var(--texto);
+}
+.btn--fantasma:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.btn--texto {
+  background: transparent;
+  color: var(--texto-suave);
+  padding: 9px 14px;
+}
+.btn--texto:hover { color: var(--texto); }
+
+.btn--pequeno {
+  padding: 8px 14px;
+  font-size: 0.85rem;
+}
+
+.btn--largo {
+  width: 100%;
+}
+
+/* ---------- Faixa de aviso "DEMO" ---------- */
+.faixa-demo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 9px 18px;
+  background: linear-gradient(90deg, rgba(0, 255, 136, 0.1), rgba(0, 217, 163, 0.06));
+  border-bottom: 1px solid var(--neon-borda);
+  font-size: 0.82rem;
+  color: var(--texto-suave);
+  text-align: center;
+}
+.faixa-demo strong { color: var(--texto); }
+
+.faixa-demo__selo {
+  flex-shrink: 0;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--neon);
+  color: #04120b;
+  font-weight: 800;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+}
+
+/* ---------- Cabeçalho ---------- */
+.cabecalho {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(5, 7, 10, 0.88);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--borda);
+}
+
+.cabecalho__interno {
+  max-width: var(--largura-maxima);
+  margin: 0 auto;
+  min-height: var(--altura-cabecalho);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--neon);
+  flex-shrink: 0;
+}
+.logo__raio {
+  filter: drop-shadow(0 0 8px rgba(0, 255, 136, 0.6));
+}
+.logo__texto {
+  font-family: var(--fonte-titulo);
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--texto);
+}
+.logo__destaque {
+  color: var(--neon);
+  text-shadow: 0 0 14px rgba(0, 255, 136, 0.5);
+}
+
+.nav-principal {
+  margin-left: auto;
+}
+.nav-principal ul {
+  display: flex;
+  gap: 6px;
+}
+.nav-principal a {
+  display: block;
+  padding: 8px 14px;
+  border-radius: var(--raio-pequeno);
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--texto-suave);
+  transition: color var(--transicao), background var(--transicao);
+}
+.nav-principal a:hover {
+  color: var(--neon);
+  background: var(--neon-fraco);
+}
+
+.cabecalho__conta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.saldo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.2;
+  padding: 6px 14px;
+  border: 1px solid var(--neon-borda);
+  border-radius: var(--raio-pequeno);
+  background: var(--neon-fraco);
+}
+.saldo__rotulo {
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--texto-apagado);
+}
+.saldo__valor {
+  font-family: var(--fonte-titulo);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--neon);
+  font-variant-numeric: tabular-nums;
+}
+/* Piscada rápida quando o saldo muda */
+.saldo__valor.piscou {
+  animation: piscar-saldo 600ms ease;
+}
+@keyframes piscar-saldo {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.14); text-shadow: 0 0 20px rgba(0, 255, 136, 0.8); }
+  100% { transform: scale(1); }
+}
+
+/* ---------- Layout de duas colunas ---------- */
+.layout {
+  max-width: var(--largura-maxima);
+  margin: 0 auto;
+  padding: 28px 20px 60px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 28px;
+}
+
+.conteudo {
+  min-width: 0; /* impede que o grid estoure na horizontal */
+}
+
+/* ---------- Hero ---------- */
+.hero {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 28px;
+  align-items: center;
+  padding: 20px 0 40px;
+}
+
+.etiqueta {
+  display: inline-block;
+  padding: 5px 13px;
+  border-radius: 999px;
+  border: 1px solid var(--neon-borda);
+  background: var(--neon-fraco);
+  color: var(--neon);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.hero__titulo {
+  font-size: clamp(2.6rem, 7vw, 4.6rem);
+  font-weight: 800;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.hero__descricao {
+  color: var(--texto-suave);
+  max-width: 52ch;
+  margin-bottom: 26px;
+}
+
+.hero__acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* ---------- Cartão do jogo em destaque ---------- */
+.cartao-destaque {
+  position: relative;
+  padding: 22px;
+  border-radius: var(--raio);
+  border: 1px solid var(--neon-borda);
+  background:
+    linear-gradient(160deg, rgba(0, 255, 136, 0.07), transparent 55%),
+    var(--fundo-cartao);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  overflow: hidden;
+}
+/* Linha de brilho correndo no topo do cartão */
+.cartao-destaque::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--neon), transparent);
+  animation: correr-brilho 3.5s linear infinite;
+}
+@keyframes correr-brilho {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.cartao-destaque__topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 0.78rem;
+  color: var(--texto-apagado);
+  margin-bottom: 20px;
+}
+.cartao-destaque__liga {
+  color: var(--neon-suave);
+  font-weight: 600;
+}
+
+.cartao-destaque__confronto {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.time {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+}
+.time__nome {
+  font-family: var(--fonte-titulo);
+  font-size: 1.15rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.time__escudo {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 2px solid var(--borda-forte);
+  position: relative;
+  overflow: hidden;
+  display: block;
+}
+.time__escudo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cartao-destaque__vs {
+  font-family: var(--fonte-titulo);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--texto-apagado);
+  letter-spacing: 0.1em;
+}
+
+/* ---------- Barra de esportes ---------- */
+.barra-esportes {
+  position: sticky;
+  top: var(--altura-cabecalho);
+  z-index: 60;
+  margin-bottom: 28px;
+  padding: 10px 0;
+  background: rgba(5, 7, 10, 0.9);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--borda);
+}
+.barra-esportes ul {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: thin;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+  padding: 9px 17px;
+  border-radius: 999px;
+  border: 1px solid var(--borda-forte);
+  background: var(--fundo-cartao);
+  color: var(--texto-suave);
+  font-size: 0.88rem;
+  font-weight: 600;
+  transition: all var(--transicao);
+}
+.chip:hover {
+  color: var(--neon);
+  border-color: var(--neon-borda);
+  background: var(--neon-fraco);
+}
+/* Classe aplicada pelo JavaScript conforme a seção visível */
+.chip.ativo {
+  color: #04120b;
+  background: var(--neon);
+  border-color: var(--neon);
+  box-shadow: var(--brilho-neon);
+}
+.chip.ativo .ponto-live { background: #04120b; }
+
+/* ---------- Seções ---------- */
+.secao {
+  margin-bottom: 46px;
+}
+.secao__cabecalho {
+  margin-bottom: 18px;
+}
+.secao__titulo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.secao__subtitulo {
+  margin-top: 4px;
+  font-size: 0.88rem;
+  color: var(--texto-apagado);
+}
+
+/* ---------- Lista de eventos ---------- */
+.lista-eventos {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.evento {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  padding: 16px 18px;
+  border-radius: var(--raio);
+  border: 1px solid var(--borda);
+  background: var(--fundo-cartao);
+  transition: border-color var(--transicao), transform var(--transicao),
+              box-shadow var(--transicao);
+}
+.evento:hover {
+  border-color: var(--neon-borda);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+/* Jogo ao vivo ganha uma barra verde na lateral esquerda */
+.evento--live {
+  border-left: 3px solid var(--neon);
+  background:
+    linear-gradient(90deg, rgba(0, 255, 136, 0.05), transparent 40%),
+    var(--fundo-cartao);
+}
+
+.evento__info { min-width: 0; }
+
+.evento__liga {
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--neon-suave);
+  margin-bottom: 6px;
+}
+
+.evento__times {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+.evento__vs {
+  color: var(--texto-apagado);
+  font-weight: 600;
+  margin: 0 4px;
+}
+.evento__placar {
+  display: inline-block;
+  margin: 0 8px;
+  padding: 1px 10px;
+  border-radius: 6px;
+  background: var(--neon);
+  color: #04120b;
+  font-variant-numeric: tabular-nums;
+}
+
+.evento__estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: var(--texto-apagado);
+}
+
+/* Relógio da partida: fonte tabular para os números não "dançarem" a cada
+   segundo que muda */
+.evento__relogio {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+/* Jogo que acabou: perde o destaque verde e as odds congelam */
+.evento--encerrado {
+  opacity: 0.55;
+  border-left-color: var(--texto-apagado);
+  background: var(--fundo-cartao);
+}
+.evento--encerrado .ponto-live {
+  background: var(--texto-apagado);
+  animation: none;
+  box-shadow: none;
+}
+.evento--encerrado .odd {
+  pointer-events: none;
+}
+
+/* ---------- Odds ---------- */
+.odds {
+  display: grid;
+  gap: 8px;
+}
+.odds--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.odds--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+.odd {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-height: 58px;
+  padding: 9px 8px;
+  border-radius: var(--raio-pequeno);
+  border: 1px solid var(--borda-forte);
+  background: var(--fundo-cartao-2);
+  transition: all var(--transicao);
+}
+.odd:hover {
+  border-color: var(--neon);
+  background: var(--neon-fraco);
+  box-shadow: var(--brilho-neon);
+}
+
+.odd__rotulo {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--texto-apagado);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.odd__valor {
+  font-family: var(--fonte-titulo);
+  font-size: 1.32rem;
+  font-weight: 700;
+  color: var(--neon);
+  font-variant-numeric: tabular-nums;
+  transition: color var(--transicao), transform var(--transicao);
+}
+
+/* Odd que está no cupom */
+.odd.selecionada {
+  border-color: var(--neon);
+  background: linear-gradient(135deg, var(--neon), var(--neon-suave));
+  box-shadow: var(--brilho-forte);
+}
+.odd.selecionada .odd__rotulo,
+.odd.selecionada .odd__valor {
+  color: #04120b;
+}
+
+/* Animação de quando a odd sobe ou desce (jogos ao vivo) */
+.odd.subiu .odd__valor {
+  color: var(--neon-forte);
+  transform: translateY(-3px);
+}
+.odd.subiu {
+  background: var(--neon-fraco);
+  border-color: var(--neon);
+}
+.odd.caiu .odd__valor {
+  color: var(--vermelho);
+  transform: translateY(3px);
+}
+.odd.caiu {
+  background: var(--vermelho-fraco);
+  border-color: var(--vermelho);
+}
+/* Se estiver selecionada, o destaque de subida/queda não sobrepõe */
+.odd.selecionada.subiu .odd__valor,
+.odd.selecionada.caiu .odd__valor { color: #04120b; }
+
+/* ---------- Cassino (crash, slots e mesas) ---------- */
+.grade-cassino {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 14px;
+}
+
+.jogo-cassino {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--raio);
+  overflow: hidden;
+  border: 1px solid var(--borda);
+  background: var(--fundo-cartao);
+  transition: border-color var(--transicao), transform var(--transicao),
+              box-shadow var(--transicao);
+}
+.jogo-cassino:hover {
+  border-color: var(--neon-borda);
+  transform: translateY(-3px);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.45);
+}
+
+.jogo-cassino__capa {
+  position: relative;
+  height: 155px;
+  overflow: hidden;
+  background: var(--fundo-cartao-2);
+}
+.jogo-cassino__capa img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Prioriza o topo da imagem: é onde fica o selo do provedor do jogo */
+  object-position: center top;
+  display: block;
+  transition: transform var(--transicao);
+}
+.jogo-cassino:hover .jogo-cassino__capa img {
+  transform: scale(1.05);
+}
+.jogo-cassino__multiplicador {
+  position: absolute;
+  bottom: 9px;
+  left: 10px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-family: var(--fonte-titulo);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #04120b;
+  background: var(--neon);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+  font-variant-numeric: tabular-nums;
+  transition: background var(--transicao), color var(--transicao);
+}
+/* Aviator "explodiu": o multiplicador pisca vermelho até reiniciar o voo */
+.jogo-cassino__multiplicador--caiu {
+  background: var(--vermelho);
+  color: #fff;
+}
+
+.jogo-cassino__rodape {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px 14px;
+}
+.jogo-cassino__nome {
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.jogo-cassino__categoria {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.7rem;
+  color: var(--texto-apagado);
+}
+.jogo-cassino__jogar {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  border-radius: var(--raio-pequeno);
+  border: 1px solid var(--neon-borda);
+  background: var(--neon-fraco);
+  color: var(--neon);
+  font-size: 0.78rem;
+  font-weight: 700;
+  transition: all var(--transicao);
+}
+.jogo-cassino__jogar:hover {
+  background: var(--neon);
+  color: #04120b;
+  box-shadow: var(--brilho-neon);
+}
+
+/* ---------- Cupom de aposta ---------- */
+.cupom {
+  border-radius: var(--raio);
+  border: 1px solid var(--neon-borda);
+  background: var(--fundo-elevado);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+}
+
+.cupom__topo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 15px 18px;
+  border: 0;
+  background: linear-gradient(135deg, rgba(0, 255, 136, 0.14), rgba(0, 217, 163, 0.05));
+  border-bottom: 1px solid var(--borda);
+  text-align: left;
+}
+
+.cupom__titulo {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--fonte-titulo);
+  font-size: 1.3rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.cupom__contador {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 25px;
+  height: 25px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--neon);
+  color: #04120b;
+  font-family: var(--fonte-texto);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.cupom__retorno-resumo {
+  margin-left: auto;
+  font-size: 0.8rem;
+  color: var(--texto-apagado);
+}
+.cupom__retorno-resumo strong {
+  color: var(--neon);
+  font-variant-numeric: tabular-nums;
+}
+
+/* A seta só aparece no celular, onde o cupom abre e fecha */
+.cupom__seta { display: none; }
+
+.cupom__corpo {
+  padding: 16px 18px 18px;
+}
+
+.cupom__vazio,
+.vazio {
+  padding: 22px 6px;
+  text-align: center;
+  color: var(--texto-apagado);
+  font-size: 0.88rem;
+  line-height: 1.7;
+}
+
+.cupom__lista {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-bottom: 16px;
+}
+
+.selecao {
+  position: relative;
+  padding: 11px 38px 11px 13px;
+  border-radius: var(--raio-pequeno);
+  border: 1px solid var(--borda);
+  background: var(--fundo-cartao);
+  animation: entrar 220ms ease;
+}
+@keyframes entrar {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.selecao__jogo {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--texto-apagado);
+  margin-bottom: 3px;
+}
+.selecao__linha {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.selecao__nome {
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+.selecao__odd {
+  font-family: var(--fonte-titulo);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--neon);
+  font-variant-numeric: tabular-nums;
+}
+
+.selecao__remover {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--texto-apagado);
+  font-size: 1.1rem;
+  line-height: 1;
+  transition: all var(--transicao);
+}
+.selecao__remover:hover {
+  background: var(--vermelho-fraco);
+  color: var(--vermelho);
+}
+
+.cupom__tipo {
+  padding: 7px 12px;
+  margin-bottom: 14px;
+  border-radius: var(--raio-pequeno);
+  background: var(--neon-fraco);
+  border: 1px solid var(--neon-borda);
+  color: var(--neon);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-align: center;
+  letter-spacing: 0.04em;
+}
+
+/* Seletor Simples / Múltipla — só aparece com 2 ou mais seleções */
+.modo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 10px;
+  border-radius: var(--raio-pequeno);
+  border: 1px solid var(--borda-forte);
+  background: var(--fundo-base);
+}
+
+.modo__botao {
+  /* 44px é o mínimo confortável para o dedo em tela de toque */
+  min-height: 44px;
+  padding: 9px 8px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--texto-suave);
+  font-size: 0.86rem;
+  font-weight: 600;
+  transition: all var(--transicao);
+}
+.modo__botao:hover {
+  color: var(--neon);
+  background: var(--neon-fraco);
+}
+.modo__botao.ativo {
+  background: linear-gradient(135deg, var(--neon), var(--neon-suave));
+  color: #04120b;
+  box-shadow: var(--brilho-neon);
+}
+
+/* Frase curta explicando o risco de cada modo */
+.modo__explicacao {
+  margin-bottom: 12px;
+  padding: 8px 11px;
+  border-radius: var(--raio-pequeno);
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 2px solid var(--neon-suave);
+  font-size: 0.76rem;
+  line-height: 1.5;
+  color: var(--texto-apagado);
+}
+
+/* Retorno individual de cada seleção (aparece só no modo simples) */
+.selecao__retorno {
+  display: block;
+  margin-top: 5px;
+  padding-top: 5px;
+  border-top: 1px dashed var(--borda);
+  font-size: 0.76rem;
+  color: var(--texto-apagado);
+}
+.selecao__retorno strong {
+  color: var(--neon);
+  font-variant-numeric: tabular-nums;
+}
+
+.campo {
+  display: block;
+  margin-bottom: 10px;
+}
+.campo__rotulo {
+  display: block;
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--texto-apagado);
+  margin-bottom: 6px;
+}
+.campo__entrada {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: var(--raio-pequeno);
+  border: 1px solid var(--borda-forte);
+  background: var(--fundo-base);
+  color: var(--texto);
+  font-family: var(--fonte-titulo);
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  transition: border-color var(--transicao), box-shadow var(--transicao);
+}
+.campo__entrada:focus {
+  outline: none;
+  border-color: var(--neon);
+  box-shadow: var(--brilho-neon);
+}
+
+.atalhos-valor {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.atalho {
+  padding: 8px 4px;
+  border-radius: 7px;
+  border: 1px solid var(--borda-forte);
+  background: var(--fundo-cartao);
+  color: var(--texto-suave);
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: all var(--transicao);
+}
+.atalho:hover {
+  border-color: var(--neon);
+  color: var(--neon);
+  background: var(--neon-fraco);
+}
+
+.cupom__resumo {
+  margin: 0 0 14px;
+  padding: 13px 15px;
+  border-radius: var(--raio-pequeno);
+  background: var(--fundo-cartao);
+  border: 1px solid var(--borda);
+}
+.cupom__resumo > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.cupom__resumo > div + div {
+  margin-top: 9px;
+  padding-top: 9px;
+  border-top: 1px dashed var(--borda-forte);
+}
+.cupom__resumo dt {
+  font-size: 0.82rem;
+  color: var(--texto-suave);
+}
+.cupom__resumo dd {
+  margin: 0;
+  font-family: var(--fonte-titulo);
+  font-size: 1.05rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.cupom__resumo--destaque dt { color: var(--texto); }
+.cupom__resumo--destaque dd {
+  font-size: 1.45rem;
+  color: var(--neon);
+  text-shadow: 0 0 14px rgba(0, 255, 136, 0.4);
+}
+
+.cupom__erro {
+  margin-bottom: 12px;
+  padding: 10px 13px;
+  border-radius: var(--raio-pequeno);
+  background: var(--vermelho-fraco);
+  border: 1px solid rgba(255, 77, 109, 0.4);
+  color: var(--vermelho);
+  font-size: 0.84rem;
+}
+
+/* ---------- Histórico ---------- */
+.historico {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.aposta {
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: var(--raio);
+  border: 1px solid var(--borda);
+  border-left: 3px solid var(--neon-suave);
+  background: var(--fundo-cartao);
+}
+.aposta__topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.aposta__tipo {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--neon-suave);
+  font-weight: 700;
+}
+.aposta__data {
+  font-size: 0.75rem;
+  color: var(--texto-apagado);
+}
+.aposta__selecoes {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.86rem;
+  color: var(--texto-suave);
+}
+.aposta__selecoes li::before {
+  content: "▸ ";
+  color: var(--neon);
+}
+.aposta__numeros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--borda-forte);
+  font-size: 0.82rem;
+  color: var(--texto-apagado);
+}
+.aposta__numeros strong {
+  display: block;
+  font-family: var(--fonte-titulo);
+  font-size: 1.1rem;
+  color: var(--texto);
+  font-variant-numeric: tabular-nums;
+}
+.aposta__numeros .destaque strong { color: var(--neon); }
+
+/* Status da liquidação: pendente (padrão), ganhou (verde) ou perdeu (vermelho) */
+.aposta--ganhou { border-left-color: var(--neon); }
+.aposta--perdeu { border-left-color: var(--vermelho); }
+.aposta--perdeu .aposta__numeros .destaque strong {
+  color: var(--texto-apagado);
+  text-decoration: line-through;
+}
+
+.aposta__status {
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: var(--fundo-cartao-2);
+  color: var(--texto-suave);
+}
+.aposta--ganhou .aposta__status { background: var(--neon-fraco); color: var(--neon); }
+.aposta--perdeu .aposta__status { background: var(--vermelho-fraco); color: var(--vermelho); }
+
+/* Dentro de uma múltipla, cada perna mostra se já ganhou ou perdeu */
+.aposta__selecoes li.resultado--ganhou { color: var(--neon); }
+.aposta__selecoes li.resultado--ganhou::before { content: "✓ "; color: var(--neon); }
+.aposta__selecoes li.resultado--perdeu { color: var(--texto-apagado); text-decoration: line-through; }
+.aposta__selecoes li.resultado--perdeu::before { content: "✗ "; color: var(--vermelho); text-decoration: none; }
+
+/* ---------- Rodapé ---------- */
+.rodape {
+  border-top: 1px solid var(--borda);
+  background: var(--fundo-elevado);
+  padding: 48px 20px 28px;
+}
+.rodape__interno {
+  max-width: var(--largura-maxima);
+  margin: 0 auto;
+  display: grid;
+  gap: 34px;
+}
+.rodape__marca p {
+  margin-top: 12px;
+  max-width: 46ch;
+  font-size: 0.86rem;
+  color: var(--texto-apagado);
+}
+.logo--rodape { margin-bottom: 4px; }
+
+.rodape__links {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 26px;
+}
+.rodape__links h3 {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--texto);
+  margin-bottom: 12px;
+}
+.rodape__links a {
+  display: block;
+  padding: 4px 0;
+  font-size: 0.88rem;
+  color: var(--texto-apagado);
+  transition: color var(--transicao);
+}
+.rodape__links a:hover { color: var(--neon); }
+
+.rodape__responsavel {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 20px;
+  border-radius: var(--raio);
+  border: 1px solid var(--borda-forte);
+  background: var(--fundo-cartao);
+}
+.rodape__responsavel h3 {
+  font-size: 1rem;
+  text-transform: uppercase;
+  margin-bottom: 7px;
+}
+.rodape__responsavel p {
+  font-size: 0.84rem;
+  color: var(--texto-apagado);
+  max-width: 78ch;
+}
+.rodape__responsavel strong { color: var(--texto-suave); }
+
+.selo-18 {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 2px solid var(--vermelho);
+  color: var(--vermelho);
+  font-family: var(--fonte-titulo);
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.rodape__creditos {
+  padding-top: 20px;
+  border-top: 1px solid var(--borda);
+  font-size: 0.8rem;
+  color: var(--texto-apagado);
+  text-align: center;
+}
+
+/* ---------- Toast ---------- */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  z-index: 300;
+  transform: translate(-50%, 130%);
+  max-width: min(92vw, 420px);
+  padding: 14px 22px;
+  border-radius: var(--raio-pequeno);
+  border: 1px solid var(--neon);
+  background: var(--fundo-cartao);
+  box-shadow: var(--brilho-forte), 0 18px 40px rgba(0, 0, 0, 0.6);
+  color: var(--texto);
+  font-size: 0.92rem;
+  font-weight: 500;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 320ms cubic-bezier(0.2, 0.9, 0.3, 1.2), opacity 320ms ease;
+}
+.toast.visivel {
+  transform: translate(-50%, 0);
+  opacity: 1;
+}
+.toast--erro {
+  border-color: var(--vermelho);
+  box-shadow: 0 0 22px rgba(255, 77, 109, 0.45), 0 18px 40px rgba(0, 0, 0, 0.6);
+}
+
+/* --------------------------------------------------------------------------
+   4. RESPONSIVO
+   Estratégia: o CSS acima já é a versão de celular. Aqui vão só os ajustes
+   para telas maiores, mais o comportamento de gaveta do cupom no celular.
+   -------------------------------------------------------------------------- */
+
+/* ---- CELULAR: cupom vira barra fixa no rodapé que expande ---- */
+@media (max-width: 1023px) {
+  .cupom {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 200;
+    border-radius: var(--raio) var(--raio) 0 0;
+    border-left: 0;
+    border-right: 0;
+    border-bottom: 0;
+  }
+
+  .cupom__seta {
+    display: block;
+    width: 10px;
+    height: 10px;
+    border-right: 2px solid var(--neon);
+    border-bottom: 2px solid var(--neon);
+    transform: rotate(-135deg);
+    transition: transform var(--transicao);
+  }
+  /* Cupom fechado: o corpo some e a seta aponta para cima */
+  .cupom__corpo { display: none; }
+  .cupom.aberto .cupom__corpo {
+    display: block;
+    max-height: 62vh;
+    overflow-y: auto;
+  }
+  .cupom.aberto .cupom__seta { transform: rotate(45deg); }
+
+  /* Espaço no fim da página para a barra do cupom não cobrir o conteúdo */
+  .rodape { padding-bottom: 96px; }
+
+  .toast { bottom: 96px; }
+}
+
+/* ---- TABLET ---- */
+@media (min-width: 640px) {
+  .evento {
+    grid-template-columns: 1fr auto;
+    align-items: center;
+  }
+  .odds--2 { min-width: 210px; }
+  .odds--3 { min-width: 300px; }
+
+  .rodape__interno {
+    grid-template-columns: 1.3fr 1fr;
+  }
+  .rodape__responsavel,
+  .rodape__creditos {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ---- DESKTOP: duas colunas, cupom fixo na lateral ---- */
+@media (min-width: 1024px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr) 340px;
+    align-items: start;
+  }
+
+  .hero {
+    grid-template-columns: 1.05fr 0.95fr;
+  }
+
+  .cupom {
+    position: sticky;
+    /* Encosta logo abaixo do cabeçalho fixo */
+    top: calc(var(--altura-cabecalho) + 16px);
+    max-height: calc(100vh - var(--altura-cabecalho) - 32px);
+    display: flex;
+    flex-direction: column;
+  }
+  .cupom__corpo {
+    overflow-y: auto;
+  }
+  /* No desktop o cabeçalho do cupom não é clicável para abrir/fechar */
+  .cupom__topo { cursor: default; }
+}
+
+/* --------------------------------------------------------------------------
+   ACESSIBILIDADE: quem pede menos movimento não recebe animação nenhuma.
+   O fundo animado também é desligado pelo JavaScript nesse caso.
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .fundo-animado { display: none; }
+}

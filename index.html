@@ -1,0 +1,1454 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="VOLTBET — demonstração de portfólio de uma casa de apostas esportivas. Odds ao vivo, cupom de aposta e saldo fictícios, sem dinheiro real.">
+  <meta name="theme-color" content="#05070a">
+  <title>VOLTBET — Apostas esportivas (demonstração de portfólio)</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Ícone em SVG inline (data URI) para não depender de arquivo de imagem externo -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2305070a'/%3E%3Cpath d='M18 4 L8 18 h6 l-2 10 10-14 h-6 z' fill='%2300ff88'/%3E%3C/svg%3E">
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/paginas.css">
+</head>
+<body>
+
+  <!-- Atalho de teclado: o primeiro Tab da página pula direto para o conteúdo -->
+  <a class="pular-para-conteudo" href="#conteudo">Pular para o conteúdo</a>
+
+  <!--
+    Fundo animado (partículas verdes conectadas), desenhado em canvas.
+    aria-hidden porque é puramente decorativo. Se o JavaScript não rodar,
+    sobra apenas o gradiente escuro definido no CSS — nada quebra.
+  -->
+  <canvas id="fundo-animado" class="fundo-animado" aria-hidden="true"></canvas>
+
+  <!-- ================== FAIXA DE AVISO ================== -->
+  <div class="faixa-demo" role="note">
+    <span class="faixa-demo__selo">DEMO</span>
+    <p>
+      Projeto de <strong>portfólio</strong>. Os jogos, as odds e o saldo são
+      <strong>fictícios</strong> — nenhuma aposta real é feita e nenhum pagamento é processado.
+    </p>
+  </div>
+
+  <!-- ================== CABEÇALHO ================== -->
+  <header class="cabecalho">
+    <div class="cabecalho__interno">
+
+      <a class="logo" href="#inicio" aria-label="VOLTBET, página inicial">
+        <svg class="logo__raio" viewBox="0 0 32 32" width="28" height="28" aria-hidden="true" focusable="false">
+          <path d="M18 4 L8 18 h6 l-2 10 10-14 h-6 z" fill="currentColor"/>
+        </svg>
+        <span class="logo__texto">VOLT<span class="logo__destaque">BET</span></span>
+      </a>
+
+      <nav class="nav-principal" aria-label="Navegação principal">
+        <ul>
+          <li><a href="#ao-vivo">Ao vivo</a></li>
+          <li><a href="#futebol">Esportes</a></li>
+          <li><a href="#cassino">Cassino</a></li>
+          <li><a href="#historico">Minhas apostas</a></li>
+        </ul>
+      </nav>
+
+      <div class="cabecalho__conta">
+        <!--
+          O saldo já vem escrito no HTML para aparecer sem JavaScript.
+          O script apenas o atualiza com o valor guardado no localStorage.
+        -->
+        <div class="saldo">
+          <span class="saldo__rotulo">Saldo</span>
+          <strong class="saldo__valor" id="saldo-valor" aria-live="polite">R$&nbsp;500,00</strong>
+        </div>
+
+        <a class="btn btn--contorno btn--pequeno" href="recarregar.html">
+          Recarregar
+        </a>
+
+        <button class="avatar" type="button" id="btn-perfil"
+                aria-expanded="false" aria-controls="painel-perfil"
+                aria-label="Abrir painel de perfil">
+          <span class="avatar__iniciais" aria-hidden="true">BG</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ================== LAYOUT PRINCIPAL ================== -->
+  <div class="layout" id="conteudo">
+
+    <main class="conteudo">
+
+      <!-- ---------- HERO ---------- -->
+      <section class="hero" id="inicio" aria-labelledby="hero-titulo">
+        <div class="hero__texto">
+          <span class="etiqueta">Destaque da rodada</span>
+          <h1 class="hero__titulo" id="hero-titulo">
+            O CLÁSSICO<br><span class="brilho-verde">VALE O TÍTULO</span>
+          </h1>
+          <p class="hero__descricao">
+            Flamengo e Palmeiras se enfrentam no Maracanã pela 34ª rodada do
+            Brasileirão separados por apenas dois pontos na tabela. Monte seu
+            cupom e acompanhe as odds mudando em tempo real.
+          </p>
+          <div class="hero__acoes">
+            <a class="btn btn--principal" href="#jogo-destaque">Ver mercados</a>
+            <a class="btn btn--fantasma" href="#ao-vivo">Jogos ao vivo</a>
+          </div>
+        </div>
+
+        <!-- Cartão do jogo em destaque: ilustração feita só com CSS/SVG -->
+        <article class="cartao-destaque" id="jogo-destaque" data-evento="fla-pal">
+          <header class="cartao-destaque__topo">
+            <span class="cartao-destaque__liga">Brasileirão Série A · 34ª rodada</span>
+            <time datetime="2026-08-29T16:00">Sábado, 16:00</time>
+          </header>
+
+          <div class="cartao-destaque__confronto">
+            <div class="time">
+              <span class="time__escudo">
+                <img src="imagens/escudo-flamengo.png" alt="Escudo do Flamengo">
+              </span>
+              <span class="time__nome">Flamengo</span>
+            </div>
+            <span class="cartao-destaque__vs">VS</span>
+            <div class="time">
+              <span class="time__escudo">
+                <img src="imagens/escudo-palmeiras.png" alt="Escudo do Palmeiras">
+              </span>
+              <span class="time__nome">Palmeiras</span>
+            </div>
+          </div>
+
+          <div class="odds odds--3" role="group" aria-label="Mercados para Flamengo x Palmeiras">
+            <button class="odd" type="button"
+                    data-evento="fla-pal" data-jogo="Flamengo x Palmeiras"
+                    data-selecao="Flamengo" data-odd="2.70">
+              <span class="odd__rotulo">Casa</span>
+              <span class="odd__valor">2.70</span>
+            </button>
+            <button class="odd" type="button"
+                    data-evento="fla-pal" data-jogo="Flamengo x Palmeiras"
+                    data-selecao="Empate" data-odd="3.65">
+              <span class="odd__rotulo">Empate</span>
+              <span class="odd__valor">3.65</span>
+            </button>
+            <button class="odd" type="button"
+                    data-evento="fla-pal" data-jogo="Flamengo x Palmeiras"
+                    data-selecao="Palmeiras" data-odd="3.50">
+              <span class="odd__rotulo">Fora</span>
+              <span class="odd__valor">3.50</span>
+            </button>
+          </div>
+        </article>
+      </section>
+
+      <!-- ---------- BARRA DE ESPORTES ---------- -->
+      <!--
+        São links de âncora de verdade: funcionam sem JavaScript, rolando
+        até a seção. O script apenas destaca o item ativo durante a rolagem.
+      -->
+      <nav class="barra-esportes" aria-label="Categorias de esporte">
+        <ul>
+          <li><a href="#ao-vivo" class="chip chip--live"><span class="ponto-live" aria-hidden="true"></span>Ao vivo</a></li>
+          <li><a href="#cassino" class="chip">Cassino</a></li>
+          <li><a href="#futebol" class="chip">Futebol</a></li>
+          <li><a href="#basquete" class="chip">Basquete</a></li>
+          <li><a href="#tenis" class="chip">Tênis</a></li>
+          <li><a href="#esports" class="chip">E-Sports</a></li>
+          <li><a href="#volei" class="chip">Vôlei</a></li>
+        </ul>
+      </nav>
+
+      <!-- ---------- AO VIVO ---------- -->
+      <section class="secao" id="ao-vivo" aria-labelledby="titulo-ao-vivo">
+        <div class="secao__cabecalho">
+          <h2 class="secao__titulo" id="titulo-ao-vivo">
+            <span class="ponto-live" aria-hidden="true"></span> Ao vivo agora
+          </h2>
+          <p class="secao__subtitulo">
+            O relógio corre de verdade. Conforme o placar muda, quem está
+            perdendo tem a odd <strong>subindo</strong> e quem está ganhando,
+            <strong>caindo</strong>.
+          </p>
+        </div>
+
+        <div class="lista-eventos">
+
+          <article class="evento evento--live" data-evento="san-vas">
+            <div class="evento__info">
+              <span class="evento__liga">Brasileirão Série A</span>
+              <h3 class="evento__times">Santos <span class="evento__placar">1 – 0</span> Vasco</h3>
+              <span class="evento__estado">
+                <span class="ponto-live" aria-hidden="true"></span>
+                <span class="evento__relogio">2º tempo · 67'</span>
+              </span>
+            </div>
+            <div class="odds odds--3" role="group" aria-label="Mercados para Santos x Vasco">
+              <button class="odd" type="button" data-evento="san-vas" data-jogo="Santos x Vasco" data-selecao="Santos" data-odd="1.33">
+                <span class="odd__rotulo">Casa</span><span class="odd__valor">1.33</span>
+              </button>
+              <button class="odd" type="button" data-evento="san-vas" data-jogo="Santos x Vasco" data-selecao="Empate" data-odd="5.86">
+                <span class="odd__rotulo">Empate</span><span class="odd__valor">5.86</span>
+              </button>
+              <button class="odd" type="button" data-evento="san-vas" data-jogo="Santos x Vasco" data-selecao="Vasco" data-odd="7.12">
+                <span class="odd__rotulo">Fora</span><span class="odd__valor">7.12</span>
+              </button>
+            </div>
+          </article>
+
+          <article class="evento evento--live" data-evento="bah-for">
+            <div class="evento__info">
+              <span class="evento__liga">Brasileirão Série A</span>
+              <h3 class="evento__times">Bahia <span class="evento__placar">0 – 0</span> Fortaleza</h3>
+              <span class="evento__estado">
+                <span class="ponto-live" aria-hidden="true"></span>
+                <span class="evento__relogio">1º tempo · 34'</span>
+              </span>
+            </div>
+            <div class="odds odds--3" role="group" aria-label="Mercados para Bahia x Fortaleza">
+              <button class="odd" type="button" data-evento="bah-for" data-jogo="Bahia x Fortaleza" data-selecao="Bahia" data-odd="2.58">
+                <span class="odd__rotulo">Casa</span><span class="odd__valor">2.58</span>
+              </button>
+              <button class="odd" type="button" data-evento="bah-for" data-jogo="Bahia x Fortaleza" data-selecao="Empate" data-odd="2.87">
+                <span class="odd__rotulo">Empate</span><span class="odd__valor">2.87</span>
+              </button>
+              <button class="odd" type="button" data-evento="bah-for" data-jogo="Bahia x Fortaleza" data-selecao="Fortaleza" data-odd="3.09">
+                <span class="odd__rotulo">Fora</span><span class="odd__valor">3.09</span>
+              </button>
+            </div>
+          </article>
+
+          <article class="evento evento--live" data-evento="cap-bra">
+            <div class="evento__info">
+              <span class="evento__liga">Brasileirão Série A</span>
+              <h3 class="evento__times">Athletico-PR <span class="evento__placar">1 – 2</span> Bragantino</h3>
+              <span class="evento__estado">
+                <span class="ponto-live" aria-hidden="true"></span>
+                <span class="evento__relogio">2º tempo · 78'</span>
+              </span>
+            </div>
+            <div class="odds odds--3" role="group" aria-label="Mercados para Athletico-PR x Bragantino">
+              <button class="odd" type="button" data-evento="cap-bra" data-jogo="Athletico-PR x Bragantino" data-selecao="Athletico-PR" data-odd="9.43">
+                <span class="odd__rotulo">Casa</span><span class="odd__valor">9.43</span>
+              </button>
+              <button class="odd" type="button" data-evento="cap-bra" data-jogo="Athletico-PR x Bragantino" data-selecao="Empate" data-odd="7.55">
+                <span class="odd__rotulo">Empate</span><span class="odd__valor">7.55</span>
+              </button>
+              <button class="odd" type="button" data-evento="cap-bra" data-jogo="Athletico-PR x Bragantino" data-selecao="Bragantino" data-odd="1.22">
+                <span class="odd__rotulo">Fora</span><span class="odd__valor">1.22</span>
+              </button>
+            </div>
+          </article>
+
+          <article class="evento evento--live" data-evento="gre-cru">
+            <div class="evento__info">
+              <span class="evento__liga">Brasileirão Série A</span>
+              <h3 class="evento__times">Grêmio <span class="evento__placar">2 – 1</span> Cruzeiro</h3>
+              <span class="evento__estado">
+                <span class="ponto-live" aria-hidden="true"></span>
+                <span class="evento__relogio">2º tempo · 55'</span>
+              </span>
+            </div>
+            <div class="odds odds--3" role="group" aria-label="Mercados para Grêmio x Cruzeiro">
+              <button class="odd" type="button" data-evento="gre-cru" data-jogo="Grêmio x Cruzeiro" data-selecao="Grêmio" data-odd="1.45">
+                <span class="odd__rotulo">Casa</span><span class="odd__valor">1.45</span>
+              </button>
+              <button class="odd" type="button" data-evento="gre-cru" data-jogo="Grêmio x Cruzeiro" data-selecao="Empate" data-odd="4.20">
+                <span class="odd__rotulo">Empate</span><span class="odd__valor">4.20</span>
+              </button>
+              <button class="odd" type="button" data-evento="gre-cru" data-jogo="Grêmio x Cruzeiro" data-selecao="Cruzeiro" data-odd="6.80">
+                <span class="odd__rotulo">Fora</span><span class="odd__valor">6.80</span>
+              </button>
+            </div>
+          </article>
+
+          <article class="evento evento--live" data-evento="mia-chi">
+            <div class="evento__info">
+              <span class="evento__liga">NBA</span>
+              <h3 class="evento__times">Miami Heat <span class="evento__placar">88 – 84</span> Chicago Bulls</h3>
+              <span class="evento__estado">
+                <span class="ponto-live" aria-hidden="true"></span>
+                <span class="evento__relogio">3º quarto · 4:12</span>
+              </span>
+            </div>
+            <div class="odds odds--2" role="group" aria-label="Mercados para Miami Heat x Chicago Bulls">
+              <button class="odd" type="button" data-evento="mia-chi" data-jogo="Miami Heat x Chicago Bulls" data-selecao="Miami Heat" data-odd="1.50">
+                <span class="odd__rotulo">Heat</span><span class="odd__valor">1.50</span>
+              </button>
+              <button class="odd" type="button" data-evento="mia-chi" data-jogo="Miami Heat x Chicago Bulls" data-selecao="Chicago Bulls" data-odd="2.62">
+                <span class="odd__rotulo">Bulls</span><span class="odd__valor">2.62</span>
+              </button>
+            </div>
+          </article>
+
+          <article class="evento evento--live" data-evento="lal-gsw-live">
+            <div class="evento__info">
+              <span class="evento__liga">NBA</span>
+              <h3 class="evento__times">LA Lakers <span class="evento__placar">50 – 54</span> Golden State</h3>
+              <span class="evento__estado">
+                <span class="ponto-live" aria-hidden="true"></span>
+                <span class="evento__relogio">2º quarto · 5:40</span>
+              </span>
+            </div>
+            <div class="odds odds--2" role="group" aria-label="Mercados para LA Lakers x Golden State ao vivo">
+              <button class="odd" type="button" data-evento="lal-gsw-live" data-jogo="LA Lakers x Golden State (ao vivo)" data-selecao="LA Lakers" data-odd="2.30">
+                <span class="odd__rotulo">Lakers</span><span class="odd__valor">2.30</span>
+              </button>
+              <button class="odd" type="button" data-evento="lal-gsw-live" data-jogo="LA Lakers x Golden State (ao vivo)" data-selecao="Golden State" data-odd="1.65">
+                <span class="odd__rotulo">Warriors</span><span class="odd__valor">1.65</span>
+              </button>
+            </div>
+          </article>
+
+          <article class="evento evento--live" data-evento="loud-furia-live">
+            <div class="evento__info">
+              <span class="evento__liga">CS2 · Major Rio · Melhor de 3</span>
+              <h3 class="evento__times">LOUD <span class="evento__placar">1 – 1</span> FURIA</h3>
+              <span class="evento__estado">
+                <span class="ponto-live" aria-hidden="true"></span>
+                <span class="evento__relogio">Mapa 3 · Nuke · 9–7</span>
+              </span>
+            </div>
+            <div class="odds odds--2" role="group" aria-label="Mercados para LOUD x FURIA ao vivo">
+              <button class="odd" type="button" data-evento="loud-furia-live" data-jogo="LOUD x FURIA (ao vivo)" data-selecao="LOUD" data-odd="1.65">
+                <span class="odd__rotulo">LOUD</span><span class="odd__valor">1.65</span>
+              </button>
+              <button class="odd" type="button" data-evento="loud-furia-live" data-jogo="LOUD x FURIA (ao vivo)" data-selecao="FURIA" data-odd="2.26">
+                <span class="odd__rotulo">FURIA</span><span class="odd__valor">2.26</span>
+              </button>
+            </div>
+          </article>
+
+          <article class="evento evento--live" data-evento="pain-imp-live">
+            <div class="evento__info">
+              <span class="evento__liga">CS2 · Major Rio · Melhor de 3</span>
+              <h3 class="evento__times">paiN Gaming <span class="evento__placar">0 – 1</span> Imperial</h3>
+              <span class="evento__estado">
+                <span class="ponto-live" aria-hidden="true"></span>
+                <span class="evento__relogio">Mapa 2 · Ancient · 5–9</span>
+              </span>
+            </div>
+            <div class="odds odds--2" role="group" aria-label="Mercados para paiN Gaming x Imperial ao vivo">
+              <button class="odd" type="button" data-evento="pain-imp-live" data-jogo="paiN Gaming x Imperial (ao vivo)" data-selecao="paiN Gaming" data-odd="5.58">
+                <span class="odd__rotulo">paiN</span><span class="odd__valor">5.58</span>
+              </button>
+              <button class="odd" type="button" data-evento="pain-imp-live" data-jogo="paiN Gaming x Imperial (ao vivo)" data-selecao="Imperial" data-odd="1.15">
+                <span class="odd__rotulo">Imperial</span><span class="odd__valor">1.15</span>
+              </button>
+            </div>
+          </article>
+
+        </div>
+      </section>
+
+      <!-- ---------- CASSINO ---------- -->
+      <section class="secao" id="cassino" aria-labelledby="titulo-cassino">
+        <div class="secao__cabecalho">
+          <h2 class="secao__titulo"><span aria-hidden="true">🎰</span> <span id="titulo-cassino">Cassino</span></h2>
+          <p class="secao__subtitulo">
+            Crash, slots, Mines, Plinko e roleta — todos jogáveis de verdade,
+            com o mesmo saldo <strong>fictício</strong> do resto do site.
+          </p>
+        </div>
+
+        <div class="grade-cassino">
+
+          <article class="jogo-cassino" data-jogo="Aviator">
+            <div class="jogo-cassino__capa">
+              <img src="imagens/jogo-aviator.png" alt="Aviator">
+              <span class="jogo-cassino__multiplicador" id="aviator-multiplicador">1.00x</span>
+            </div>
+            <div class="jogo-cassino__rodape">
+              <div>
+                <h3 class="jogo-cassino__nome">Aviator</h3>
+                <span class="jogo-cassino__categoria">Crash</span>
+              </div>
+              <button class="jogo-cassino__jogar" type="button" data-jogo="Aviator">Jogar</button>
+            </div>
+          </article>
+
+          <article class="jogo-cassino" data-jogo="Fortune Tiger">
+            <div class="jogo-cassino__capa">
+              <img src="imagens/jogo-fortune-tiger.png" alt="Fortune Tiger">
+            </div>
+            <div class="jogo-cassino__rodape">
+              <div>
+                <h3 class="jogo-cassino__nome">Fortune Tiger</h3>
+                <span class="jogo-cassino__categoria">Slot · Tigrinho</span>
+              </div>
+              <button class="jogo-cassino__jogar" type="button" data-jogo="Fortune Tiger">Jogar</button>
+            </div>
+          </article>
+
+          <article class="jogo-cassino" data-jogo="Fortune Ox">
+            <div class="jogo-cassino__capa">
+              <img src="imagens/jogo-fortune-ox.png" alt="Fortune Ox">
+            </div>
+            <div class="jogo-cassino__rodape">
+              <div>
+                <h3 class="jogo-cassino__nome">Fortune Ox</h3>
+                <span class="jogo-cassino__categoria">Slot · Boi da Sorte</span>
+              </div>
+              <button class="jogo-cassino__jogar" type="button" data-jogo="Fortune Ox">Jogar</button>
+            </div>
+          </article>
+
+          <article class="jogo-cassino" data-jogo="Fortune Rabbit">
+            <div class="jogo-cassino__capa">
+              <img src="imagens/jogo-fortune-rabbit.png" alt="Fortune Rabbit">
+            </div>
+            <div class="jogo-cassino__rodape">
+              <div>
+                <h3 class="jogo-cassino__nome">Fortune Rabbit</h3>
+                <span class="jogo-cassino__categoria">Slot · Coelho da Sorte</span>
+              </div>
+              <button class="jogo-cassino__jogar" type="button" data-jogo="Fortune Rabbit">Jogar</button>
+            </div>
+          </article>
+
+          <article class="jogo-cassino" data-jogo="Mines">
+            <div class="jogo-cassino__capa">
+              <img src="imagens/jogo-mines.png" alt="Mines">
+            </div>
+            <div class="jogo-cassino__rodape">
+              <div>
+                <h3 class="jogo-cassino__nome">Mines</h3>
+                <span class="jogo-cassino__categoria">Crash · Campo minado</span>
+              </div>
+              <button class="jogo-cassino__jogar" type="button" data-jogo="Mines">Jogar</button>
+            </div>
+          </article>
+
+          <article class="jogo-cassino" data-jogo="Sweet Bonanza">
+            <div class="jogo-cassino__capa">
+              <img src="imagens/jogo-sweet-bonanza.png" alt="Sweet Bonanza">
+            </div>
+            <div class="jogo-cassino__rodape">
+              <div>
+                <h3 class="jogo-cassino__nome">Sweet Bonanza</h3>
+                <span class="jogo-cassino__categoria">Slot</span>
+              </div>
+              <button class="jogo-cassino__jogar" type="button" data-jogo="Sweet Bonanza">Jogar</button>
+            </div>
+          </article>
+
+          <article class="jogo-cassino" data-jogo="Plinko">
+            <div class="jogo-cassino__capa">
+              <img src="imagens/jogo-plinko.png" alt="Plinko">
+            </div>
+            <div class="jogo-cassino__rodape">
+              <div>
+                <h3 class="jogo-cassino__nome">Plinko</h3>
+                <span class="jogo-cassino__categoria">Crash · Bolinhas</span>
+              </div>
+              <button class="jogo-cassino__jogar" type="button" data-jogo="Plinko">Jogar</button>
+            </div>
+          </article>
+
+          <article class="jogo-cassino" data-jogo="Roleta Brasileira">
+            <div class="jogo-cassino__capa">
+              <img src="imagens/jogo-roleta-brasileira.png" alt="Roleta Brasileira">
+            </div>
+            <div class="jogo-cassino__rodape">
+              <div>
+                <h3 class="jogo-cassino__nome">Roleta Brasileira</h3>
+                <span class="jogo-cassino__categoria">Mesa ao vivo</span>
+              </div>
+              <button class="jogo-cassino__jogar" type="button" data-jogo="Roleta Brasileira">Jogar</button>
+            </div>
+          </article>
+
+        </div>
+      </section>
+
+      <!-- ---------- FUTEBOL ---------- -->
+      <section class="secao" id="futebol" aria-labelledby="titulo-futebol">
+        <div class="secao__cabecalho">
+          <h2 class="secao__titulo"><span aria-hidden="true">⚽</span> <span id="titulo-futebol">Futebol</span></h2>
+          <p class="secao__subtitulo">Brasileirão Série A e Libertadores.</p>
+        </div>
+
+        <div class="lista-eventos">
+
+          <article class="evento" data-evento="cor-sao">
+            <div class="evento__info">
+              <span class="evento__liga">Brasileirão Série A</span>
+              <h3 class="evento__times">Corinthians <span class="evento__vs">x</span> São Paulo</h3>
+              <time class="evento__estado" datetime="2026-08-29T18:30">Sábado, 18:30</time>
+            </div>
+            <div class="odds odds--3" role="group" aria-label="Mercados para Corinthians x São Paulo">
+              <button class="odd" type="button" data-evento="cor-sao" data-jogo="Corinthians x São Paulo" data-selecao="Corinthians" data-odd="3.20">
+                <span class="odd__rotulo">Casa</span><span class="odd__valor">3.20</span>
+              </button>
+              <button class="odd" type="button" data-evento="cor-sao" data-jogo="Corinthians x São Paulo" data-selecao="Empate" data-odd="3.55">
+                <span class="odd__rotulo">Empate</span><span class="odd__valor">3.55</span>
+              </button>
+              <button class="odd" type="button" data-evento="cor-sao" data-jogo="Corinthians x São Paulo" data-selecao="São Paulo" data-odd="2.95">
+                <span class="odd__rotulo">Fora</span><span class="odd__valor">2.95</span>
+              </button>
+            </div>
+          </article>
+
+          <article class="evento" data-evento="gre-int">
+            <div class="evento__info">
+              <span class="evento__liga">Brasileirão Série A</span>
+              <h3 class="evento__times">Grêmio <span class="evento__vs">x</span> Internacional</h3>
+              <time class="evento__estado" datetime="2026-08-30T16:00">Domingo, 16:00</time>
+            </div>
+            <div class="odds odds--3" role="group" aria-label="Mercados para Grêmio x Internacional">
+              <button class="odd" type="button" data-evento="gre-int" data-jogo="Grêmio x Internacional" data-selecao="Grêmio" data-odd="2.75">
+                <span class="odd__rotulo">Casa</span><span class="odd__valor">2.75</span>
+              </button>
+              <button class="odd" type="button" data-evento="gre-int" data-jogo="Grêmio x Internacional" data-selecao="Empate" data-odd="3.50">
+                <span class="odd__rotulo">Empate</span><span class="odd__valor">3.50</span>
+              </button>
+              <button class="odd" type="button" data-evento="gre-int" data-jogo="Grêmio x Internacional" data-selecao="Internacional" data-odd="3.30">
+                <span class="odd__rotulo">Fora</span><span class="odd__valor">3.30</span>
+              </button>
+            </div>
+          </article>
+
+          <article class="evento" data-evento="bot-cam">
+            <div class="evento__info">
+              <span class="evento__liga">Libertadores · Quartas de final</span>
+              <h3 class="evento__times">Botafogo <span class="evento__vs">x</span> Atlético-MG</h3>
+              <time class="evento__estado" datetime="2026-09-01T21:30">Terça, 21:30</time>
+            </div>
+            <div class="odds odds--3" role="group" aria-label="Mercados para Botafogo x Atlético-MG">
+              <button class="odd" type="button" data-evento="bot-cam" data-jogo="Botafogo x Atlético-MG" data-selecao="Botafogo" data-odd="2.35">
+                <span class="odd__rotulo">Casa</span><span class="odd__valor">2.35</span>
+              </button>
+              <button class="odd" type="button" data-evento="bot-cam" data-jogo="Botafogo x Atlético-MG" data-selecao="Empate" data-odd="3.70">
+                <span class="odd__rotulo">Empate</span><span class="odd__valor">3.70</span>
+              </button>
+              <button class="odd" type="button" data-evento="bot-cam" data-jogo="Botafogo x Atlético-MG" data-selecao="Atlético-MG" data-odd="3.90">
+                <span class="odd__rotulo">Fora</span><span class="odd__valor">3.90</span>
+              </button>
+            </div>
+          </article>
+
+          <article class="evento" data-evento="flu-cru">
+            <div class="evento__info">
+              <span class="evento__liga">Brasileirão Série A</span>
+              <h3 class="evento__times">Fluminense <span class="evento__vs">x</span> Cruzeiro</h3>
+              <time class="evento__estado" datetime="2026-08-30T18:30">Domingo, 18:30</time>
+            </div>
+            <div class="odds odds--3" role="group" aria-label="Mercados para Fluminense x Cruzeiro">
+              <button class="odd" type="button" data-evento="flu-cru" data-jogo="Fluminense x Cruzeiro" data-selecao="Fluminense" data-odd="2.55">
+                <span class="odd__rotulo">Casa</span><span class="odd__valor">2.55</span>
+              </button>
+              <button class="odd" type="button" data-evento="flu-cru" data-jogo="Fluminense x Cruzeiro" data-selecao="Empate" data-odd="3.40">
+                <span class="odd__rotulo">Empate</span><span class="odd__valor">3.40</span>
+              </button>
+              <button class="odd" type="button" data-evento="flu-cru" data-jogo="Fluminense x Cruzeiro" data-selecao="Cruzeiro" data-odd="3.80">
+                <span class="odd__rotulo">Fora</span><span class="odd__valor">3.80</span>
+              </button>
+            </div>
+          </article>
+
+          <article class="evento" data-evento="vas-bot">
+            <div class="evento__info">
+              <span class="evento__liga">Brasileirão Série A · Clássico carioca</span>
+              <h3 class="evento__times">Vasco <span class="evento__vs">x</span> Botafogo</h3>
+              <time class="evento__estado" datetime="2026-09-05T20:00">Sábado, 20:00</time>
+            </div>
+            <div class="odds odds--3" role="group" aria-label="Mercados para Vasco x Botafogo">
+              <button class="odd" type="button" data-evento="vas-bot" data-jogo="Vasco x Botafogo" data-selecao="Vasco" data-odd="2.60">
+                <span class="odd__rotulo">Casa</span><span class="odd__valor">2.60</span>
+              </button>
+              <button class="odd" type="button" data-evento="vas-bot" data-jogo="Vasco x Botafogo" data-selecao="Empate" data-odd="3.30">
+                <span class="odd__rotulo">Empate</span><span class="odd__valor">3.30</span>
+              </button>
+              <button class="odd" type="button" data-evento="vas-bot" data-jogo="Vasco x Botafogo" data-selecao="Botafogo" data-odd="2.70">
+                <span class="odd__rotulo">Fora</span><span class="odd__valor">2.70</span>
+              </button>
+            </div>
+          </article>
+
+          <article class="evento" data-evento="cru-cam">
+            <div class="evento__info">
+              <span class="evento__liga">Brasileirão Série A · Clássico mineiro</span>
+              <h3 class="evento__times">Cruzeiro <span class="evento__vs">x</span> Atlético-MG</h3>
+              <time class="evento__estado" datetime="2026-09-06T16:00">Domingo, 16:00</time>
+            </div>
+            <div class="odds odds--3" role="group" aria-label="Mercados para Cruzeiro x Atlético-MG">
+              <button class="odd" type="button" data-evento="cru-cam" data-jogo="Cruzeiro x Atlético-MG" data-selecao="Cruzeiro" data-odd="2.90">
+                <span class="odd__rotulo">Casa</span><span class="odd__valor">2.90</span>
+              </button>
+              <button class="odd" type="button" data-evento="cru-cam" data-jogo="Cruzeiro x Atlético-MG" data-selecao="Empate" data-odd="3.20">
+                <span class="odd__rotulo">Empate</span><span class="odd__valor">3.20</span>
+              </button>
+              <button class="odd" type="button" data-evento="cru-cam" data-jogo="Cruzeiro x Atlético-MG" data-selecao="Atlético-MG" data-odd="2.50">
+                <span class="odd__rotulo">Fora</span><span class="odd__valor">2.50</span>
+              </button>
+            </div>
+          </article>
+
+        </div>
+      </section>
+
+      <!-- ---------- BASQUETE ---------- -->
+      <section class="secao" id="basquete" aria-labelledby="titulo-basquete">
+        <div class="secao__cabecalho">
+          <h2 class="secao__titulo"><span aria-hidden="true">🏀</span> <span id="titulo-basquete">Basquete</span></h2>
+          <p class="secao__subtitulo">NBA — temporada regular. Sem empate: só vitória de um dos lados.</p>
+        </div>
+
+        <div class="lista-eventos">
+
+          <article class="evento" data-evento="lal-bos">
+            <div class="evento__info">
+              <span class="evento__liga">NBA</span>
+              <h3 class="evento__times">LA Lakers <span class="evento__vs">x</span> Boston Celtics</h3>
+              <time class="evento__estado" datetime="2026-09-02T22:00">Quarta, 22:00</time>
+            </div>
+            <div class="odds odds--2" role="group" aria-label="Mercados para Lakers x Celtics">
+              <button class="odd" type="button" data-evento="lal-bos" data-jogo="LA Lakers x Boston Celtics" data-selecao="LA Lakers" data-odd="2.30">
+                <span class="odd__rotulo">Lakers</span><span class="odd__valor">2.30</span>
+              </button>
+              <button class="odd" type="button" data-evento="lal-bos" data-jogo="LA Lakers x Boston Celtics" data-selecao="Boston Celtics" data-odd="2.00">
+                <span class="odd__rotulo">Celtics</span><span class="odd__valor">2.00</span>
+              </button>
+            </div>
+          </article>
+
+          <article class="evento" data-evento="gsw-den">
+            <div class="evento__info">
+              <span class="evento__liga">NBA</span>
+              <h3 class="evento__times">Golden State <span class="evento__vs">x</span> Denver Nuggets</h3>
+              <time class="evento__estado" datetime="2026-09-03T23:30">Quinta, 23:30</time>
+            </div>
+            <div class="odds odds--2" role="group" aria-label="Mercados para Golden State x Denver">
+              <button class="odd" type="button" data-evento="gsw-den" data-jogo="Golden State x Denver Nuggets" data-selecao="Golden State" data-odd="2.70">
+                <span class="odd__rotulo">Warriors</span><span class="odd__valor">2.70</span>
+              </button>
+              <button class="odd" type="button" data-evento="gsw-den" data-jogo="Golden State x Denver Nuggets" data-selecao="Denver Nuggets" data-odd="1.78">
+                <span class="odd__rotulo">Nuggets</span><span class="odd__valor">1.78</span>
+              </button>
+            </div>
+          </article>
+
+          <article class="evento" data-evento="mil-mia">
+            <div class="evento__info">
+              <span class="evento__liga">NBA</span>
+              <h3 class="evento__times">Milwaukee Bucks <span class="evento__vs">x</span> Miami Heat</h3>
+              <time class="evento__estado" datetime="2026-09-04T21:00">Sexta, 21:00</time>
+            </div>
+            <div class="odds odds--2" role="group" aria-label="Mercados para Milwaukee x Miami">
+              <button class="odd" type="button" data-evento="mil-mia" data-jogo="Milwaukee Bucks x Miami Heat" data-selecao="Milwaukee Bucks" data-odd="1.85">
+                <span class="odd__rotulo">Bucks</span><span class="odd__valor">1.85</span>
+              </button>
+              <button class="odd" type="button" data-evento="mil-mia" data-jogo="Milwaukee Bucks x Miami Heat" data-selecao="Miami Heat" data-odd="2.55">
+                <span class="odd__rotulo">Heat</span><span class="odd__valor">2.55</span>
+              </button>
+            </div>
+          </article>
+
+          <article class="evento" data-evento="phx-dal">
+            <div class="evento__info">
+              <span class="evento__liga">NBA</span>
+              <h3 class="evento__times">Phoenix Suns <span class="evento__vs">x</span> Dallas Mavericks</h3>
+              <time class="evento__estado" datetime="2026-09-05T22:30">Sábado, 22:30</time>
+            </div>
+            <div class="odds odds--2" role="group" aria-label="Mercados para Phoenix Suns x Dallas Mavericks">
+              <button class="odd" type="button" data-evento="phx-dal" data-jogo="Phoenix Suns x Dallas Mavericks" data-selecao="Phoenix Suns" data-odd="2.05">
+                <span class="odd__rotulo">Suns</span><span class="odd__valor">2.05</span>
+              </button>
+              <button class="odd" type="button" data-evento="phx-dal" data-jogo="Phoenix Suns x Dallas Mavericks" data-selecao="Dallas Mavericks" data-odd="1.95">
+                <span class="odd__rotulo">Mavs</span><span class="odd__valor">1.95</span>
+              </button>
+            </div>
+          </article>
+
+        </div>
+      </section>
+
+      <!-- ---------- TÊNIS ---------- -->
+      <section class="secao" id="tenis" aria-labelledby="titulo-tenis">
+        <div class="secao__cabecalho">
+          <h2 class="secao__titulo"><span aria-hidden="true">🎾</span> <span id="titulo-tenis">Tênis</span></h2>
+          <p class="secao__subtitulo">Circuito ATP — vencedor da partida.</p>
+        </div>
+
+        <div class="lista-eventos">
+
+          <article class="evento" data-evento="fon-alc">
+            <div class="evento__info">
+              <span class="evento__liga">ATP Masters 1000 · Oitavas</span>
+              <h3 class="evento__times">João Fonseca <span class="evento__vs">x</span> Carlos Alcaraz</h3>
+              <time class="evento__estado" datetime="2026-09-01T14:00">Terça, 14:00</time>
+            </div>
+            <div class="odds odds--2" role="group" aria-label="Mercados para Fonseca x Alcaraz">
+              <button class="odd" type="button" data-evento="fon-alc" data-jogo="João Fonseca x Carlos Alcaraz" data-selecao="João Fonseca" data-odd="5.00">
+                <span class="odd__rotulo">Fonseca</span><span class="odd__valor">5.00</span>
+              </button>
+              <button class="odd" type="button" data-evento="fon-alc" data-jogo="João Fonseca x Carlos Alcaraz" data-selecao="Carlos Alcaraz" data-odd="1.30">
+                <span class="odd__rotulo">Alcaraz</span><span class="odd__valor">1.30</span>
+              </button>
+            </div>
+          </article>
+
+          <article class="evento" data-evento="sin-zve">
+            <div class="evento__info">
+              <span class="evento__liga">ATP Finals</span>
+              <h3 class="evento__times">Jannik Sinner <span class="evento__vs">x</span> Alexander Zverev</h3>
+              <time class="evento__estado" datetime="2026-09-02T16:00">Quarta, 16:00</time>
+            </div>
+            <div class="odds odds--2" role="group" aria-label="Mercados para Sinner x Zverev">
+              <button class="odd" type="button" data-evento="sin-zve" data-jogo="Jannik Sinner x Alexander Zverev" data-selecao="Jannik Sinner" data-odd="1.72">
+                <span class="odd__rotulo">Sinner</span><span class="odd__valor">1.72</span>
+              </button>
+              <button class="odd" type="button" data-evento="sin-zve" data-jogo="Jannik Sinner x Alexander Zverev" data-selecao="Alexander Zverev" data-odd="2.75">
+                <span class="odd__rotulo">Zverev</span><span class="odd__valor">2.75</span>
+              </button>
+            </div>
+          </article>
+
+          <article class="evento" data-evento="wil-djo">
+            <div class="evento__info">
+              <span class="evento__liga">ATP 500 · Segunda rodada</span>
+              <h3 class="evento__times">Thiago Wild <span class="evento__vs">x</span> Novak Djokovic</h3>
+              <time class="evento__estado" datetime="2026-09-03T11:00">Quinta, 11:00</time>
+            </div>
+            <div class="odds odds--2" role="group" aria-label="Mercados para Wild x Djokovic">
+              <button class="odd" type="button" data-evento="wil-djo" data-jogo="Thiago Wild x Novak Djokovic" data-selecao="Thiago Wild" data-odd="6.00">
+                <span class="odd__rotulo">Wild</span><span class="odd__valor">6.00</span>
+              </button>
+              <button class="odd" type="button" data-evento="wil-djo" data-jogo="Thiago Wild x Novak Djokovic" data-selecao="Novak Djokovic" data-odd="1.30">
+                <span class="odd__rotulo">Djokovic</span><span class="odd__valor">1.30</span>
+              </button>
+            </div>
+          </article>
+
+          <article class="evento" data-evento="fri-med">
+            <div class="evento__info">
+              <span class="evento__liga">ATP 500 · Semifinal</span>
+              <h3 class="evento__times">Taylor Fritz <span class="evento__vs">x</span> Daniil Medvedev</h3>
+              <time class="evento__estado" datetime="2026-09-04T18:00">Sexta, 18:00</time>
+            </div>
+            <div class="odds odds--2" role="group" aria-label="Mercados para Fritz x Medvedev">
+              <button class="odd" type="button" data-evento="fri-med" data-jogo="Taylor Fritz x Daniil Medvedev" data-selecao="Taylor Fritz" data-odd="2.10">
+                <span class="odd__rotulo">Fritz</span><span class="odd__valor">2.10</span>
+              </button>
+              <button class="odd" type="button" data-evento="fri-med" data-jogo="Taylor Fritz x Daniil Medvedev" data-selecao="Daniil Medvedev" data-odd="1.75">
+                <span class="odd__rotulo">Medvedev</span><span class="odd__valor">1.75</span>
+              </button>
+            </div>
+          </article>
+
+        </div>
+      </section>
+
+      <!-- ---------- E-SPORTS ---------- -->
+      <section class="secao" id="esports" aria-labelledby="titulo-esports">
+        <div class="secao__cabecalho">
+          <h2 class="secao__titulo"><span aria-hidden="true">🎮</span> <span id="titulo-esports">E-Sports</span></h2>
+          <p class="secao__subtitulo">CS2 e VALORANT — vencedor da série.</p>
+        </div>
+
+        <div class="lista-eventos">
+
+          <article class="evento" data-evento="loud-furia">
+            <div class="evento__info">
+              <span class="evento__liga">CS2 · Major Rio · Semifinal</span>
+              <h3 class="evento__times">LOUD <span class="evento__vs">x</span> FURIA</h3>
+              <time class="evento__estado" datetime="2026-09-04T19:00">Sexta, 19:00</time>
+            </div>
+            <div class="odds odds--2" role="group" aria-label="Mercados para LOUD x FURIA">
+              <button class="odd" type="button" data-evento="loud-furia" data-jogo="LOUD x FURIA" data-selecao="LOUD" data-odd="2.15">
+                <span class="odd__rotulo">LOUD</span><span class="odd__valor">2.15</span>
+              </button>
+              <button class="odd" type="button" data-evento="loud-furia" data-jogo="LOUD x FURIA" data-selecao="FURIA" data-odd="2.00">
+                <span class="odd__rotulo">FURIA</span><span class="odd__valor">2.00</span>
+              </button>
+            </div>
+          </article>
+
+          <article class="evento" data-evento="pain-mibr">
+            <div class="evento__info">
+              <span class="evento__liga">CS2 · Major Rio · Quartas</span>
+              <h3 class="evento__times">paiN Gaming <span class="evento__vs">x</span> MIBR</h3>
+              <time class="evento__estado" datetime="2026-09-05T15:00">Sábado, 15:00</time>
+            </div>
+            <div class="odds odds--2" role="group" aria-label="Mercados para paiN Gaming x MIBR">
+              <button class="odd" type="button" data-evento="pain-mibr" data-jogo="paiN Gaming x MIBR" data-selecao="paiN Gaming" data-odd="1.90">
+                <span class="odd__rotulo">paiN</span><span class="odd__valor">1.90</span>
+              </button>
+              <button class="odd" type="button" data-evento="pain-mibr" data-jogo="paiN Gaming x MIBR" data-selecao="MIBR" data-odd="2.35">
+                <span class="odd__rotulo">MIBR</span><span class="odd__valor">2.35</span>
+              </button>
+            </div>
+          </article>
+
+          <article class="evento" data-evento="loud-sen">
+            <div class="evento__info">
+              <span class="evento__liga">VALORANT Champions · Fase de grupos</span>
+              <h3 class="evento__times">LOUD <span class="evento__vs">x</span> Sentinels</h3>
+              <time class="evento__estado" datetime="2026-09-06T13:00">Domingo, 13:00</time>
+            </div>
+            <div class="odds odds--2" role="group" aria-label="Mercados para LOUD x Sentinels">
+              <button class="odd" type="button" data-evento="loud-sen" data-jogo="LOUD x Sentinels" data-selecao="LOUD" data-odd="1.78">
+                <span class="odd__rotulo">LOUD</span><span class="odd__valor">1.78</span>
+              </button>
+              <button class="odd" type="button" data-evento="loud-sen" data-jogo="LOUD x Sentinels" data-selecao="Sentinels" data-odd="2.55">
+                <span class="odd__rotulo">Sentinels</span><span class="odd__valor">2.55</span>
+              </button>
+            </div>
+          </article>
+
+          <article class="evento" data-evento="mibr-imp">
+            <div class="evento__info">
+              <span class="evento__liga">VALORANT Champions · Fase de grupos</span>
+              <h3 class="evento__times">MIBR <span class="evento__vs">x</span> Imperial</h3>
+              <time class="evento__estado" datetime="2026-09-06T16:00">Domingo, 16:00</time>
+            </div>
+            <div class="odds odds--2" role="group" aria-label="Mercados para MIBR x Imperial">
+              <button class="odd" type="button" data-evento="mibr-imp" data-jogo="MIBR x Imperial" data-selecao="MIBR" data-odd="2.20">
+                <span class="odd__rotulo">MIBR</span><span class="odd__valor">2.20</span>
+              </button>
+              <button class="odd" type="button" data-evento="mibr-imp" data-jogo="MIBR x Imperial" data-selecao="Imperial" data-odd="1.68">
+                <span class="odd__rotulo">Imperial</span><span class="odd__valor">1.68</span>
+              </button>
+            </div>
+          </article>
+
+        </div>
+      </section>
+
+      <!-- ---------- VÔLEI ---------- -->
+      <section class="secao" id="volei" aria-labelledby="titulo-volei">
+        <div class="secao__cabecalho">
+          <h2 class="secao__titulo"><span aria-hidden="true">🏐</span> <span id="titulo-volei">Vôlei</span></h2>
+          <p class="secao__subtitulo">Superliga masculina e feminina.</p>
+        </div>
+
+        <div class="lista-eventos">
+
+          <article class="evento" data-evento="sad-pra">
+            <div class="evento__info">
+              <span class="evento__liga">Superliga Masculina</span>
+              <h3 class="evento__times">Sada Cruzeiro <span class="evento__vs">x</span> Praia Clube</h3>
+              <time class="evento__estado" datetime="2026-09-05T19:00">Sábado, 19:00</time>
+            </div>
+            <div class="odds odds--2" role="group" aria-label="Mercados para Sada Cruzeiro x Praia Clube">
+              <button class="odd" type="button" data-evento="sad-pra" data-jogo="Sada Cruzeiro x Praia Clube" data-selecao="Sada Cruzeiro" data-odd="1.62">
+                <span class="odd__rotulo">Sada</span><span class="odd__valor">1.62</span>
+              </button>
+              <button class="odd" type="button" data-evento="sad-pra" data-jogo="Sada Cruzeiro x Praia Clube" data-selecao="Praia Clube" data-odd="2.95">
+                <span class="odd__rotulo">Praia</span><span class="odd__valor">2.95</span>
+              </button>
+            </div>
+          </article>
+
+          <article class="evento" data-evento="min-ses">
+            <div class="evento__info">
+              <span class="evento__liga">Superliga Feminina</span>
+              <h3 class="evento__times">Minas Tênis <span class="evento__vs">x</span> Sesi Bauru</h3>
+              <time class="evento__estado" datetime="2026-09-06T11:00">Domingo, 11:00</time>
+            </div>
+            <div class="odds odds--2" role="group" aria-label="Mercados para Minas Tênis x Sesi Bauru">
+              <button class="odd" type="button" data-evento="min-ses" data-jogo="Minas Tênis x Sesi Bauru" data-selecao="Minas Tênis" data-odd="2.40">
+                <span class="odd__rotulo">Minas</span><span class="odd__valor">2.40</span>
+              </button>
+              <button class="odd" type="button" data-evento="min-ses" data-jogo="Minas Tênis x Sesi Bauru" data-selecao="Sesi Bauru" data-odd="1.88">
+                <span class="odd__rotulo">Sesi</span><span class="odd__valor">1.88</span>
+              </button>
+            </div>
+          </article>
+
+          <article class="evento" data-evento="osa-ren">
+            <div class="evento__info">
+              <span class="evento__liga">Superliga Feminina</span>
+              <h3 class="evento__times">Osasco <span class="evento__vs">x</span> Vôlei Renata</h3>
+              <time class="evento__estado" datetime="2026-09-06T19:00">Domingo, 19:00</time>
+            </div>
+            <div class="odds odds--2" role="group" aria-label="Mercados para Osasco x Vôlei Renata">
+              <button class="odd" type="button" data-evento="osa-ren" data-jogo="Osasco x Vôlei Renata" data-selecao="Osasco" data-odd="1.72">
+                <span class="odd__rotulo">Osasco</span><span class="odd__valor">1.72</span>
+              </button>
+              <button class="odd" type="button" data-evento="osa-ren" data-jogo="Osasco x Vôlei Renata" data-selecao="Vôlei Renata" data-odd="2.10">
+                <span class="odd__rotulo">Renata</span><span class="odd__valor">2.10</span>
+              </button>
+            </div>
+          </article>
+
+        </div>
+      </section>
+
+      <!-- ---------- HISTÓRICO ---------- -->
+      <section class="secao" id="historico" aria-labelledby="titulo-historico">
+        <div class="secao__cabecalho">
+          <h2 class="secao__titulo"><span aria-hidden="true">📋</span> <span id="titulo-historico">Minhas apostas</span></h2>
+          <p class="secao__subtitulo">Fica salvo no seu navegador. Nada é enviado para servidor nenhum.</p>
+        </div>
+
+        <div class="historico" id="lista-historico">
+          <p class="vazio" id="historico-vazio">
+            Você ainda não fez nenhuma aposta. Clique numa odd para montar seu cupom.
+          </p>
+        </div>
+
+        <button class="btn btn--contorno btn--pequeno" type="button" id="btn-limpar-historico" hidden>
+          Limpar histórico
+        </button>
+      </section>
+
+    </main>
+
+    <!-- ================== CUPOM DE APOSTA ================== -->
+    <aside class="cupom" id="cupom" aria-labelledby="titulo-cupom">
+
+      <!-- No celular este cabeçalho vira o botão que abre/fecha o cupom -->
+      <button class="cupom__topo" type="button" id="cupom-alternar"
+              aria-expanded="false" aria-controls="cupom-corpo">
+        <span class="cupom__titulo" id="titulo-cupom">
+          Cupom
+          <span class="cupom__contador" id="cupom-contador">0</span>
+        </span>
+        <span class="cupom__retorno-resumo">
+          Retorno: <strong id="resumo-retorno">R$&nbsp;0,00</strong>
+        </span>
+        <span class="cupom__seta" aria-hidden="true"></span>
+      </button>
+
+      <div class="cupom__corpo" id="cupom-corpo">
+
+        <p class="cupom__vazio" id="cupom-vazio">
+          Seu cupom está vazio.<br>
+          Toque em qualquer odd para adicionar uma seleção.
+        </p>
+
+        <ul class="cupom__lista" id="cupom-lista"></ul>
+
+        <div class="cupom__rodape" id="cupom-rodape" hidden>
+
+          <!-- Com uma seleção só, aparece este rótulo simples... -->
+          <p class="cupom__tipo" id="cupom-tipo">Aposta simples</p>
+
+          <!-- ...com duas ou mais, aparece o seletor de modo no lugar dele. -->
+          <div class="modo" role="group" aria-label="Tipo de aposta" id="cupom-modo" hidden>
+            <button class="modo__botao ativo" type="button" data-modo="simples" aria-pressed="true">
+              Simples
+            </button>
+            <button class="modo__botao" type="button" data-modo="multipla" aria-pressed="false">
+              Múltipla
+            </button>
+          </div>
+
+          <p class="modo__explicacao" id="modo-explicacao" hidden></p>
+
+          <label class="campo" for="valor-aposta">
+            <span class="campo__rotulo" id="rotulo-valor">Valor da aposta (R$)</span>
+            <input class="campo__entrada" type="number" id="valor-aposta"
+                   min="1" step="1" value="10"
+                   inputmode="decimal" autocomplete="off">
+          </label>
+
+          <div class="atalhos-valor" role="group" aria-label="Valores rápidos">
+            <button class="atalho" type="button" data-valor="10">+10</button>
+            <button class="atalho" type="button" data-valor="25">+25</button>
+            <button class="atalho" type="button" data-valor="50">+50</button>
+            <button class="atalho" type="button" data-valor="tudo">Tudo</button>
+          </div>
+
+          <dl class="cupom__resumo">
+            <!-- Só na múltipla: as odds viram uma odd única -->
+            <div id="linha-odd">
+              <dt>Odd total</dt>
+              <dd id="odd-total">1.00</dd>
+            </div>
+            <!-- Só nas simples: o valor é cobrado uma vez por seleção -->
+            <div id="linha-total" hidden>
+              <dt>Total apostado</dt>
+              <dd id="total-apostado">R$&nbsp;0,00</dd>
+            </div>
+            <div class="cupom__resumo--destaque">
+              <dt id="rotulo-retorno">Retorno possível</dt>
+              <dd id="retorno-possivel">R$&nbsp;0,00</dd>
+            </div>
+          </dl>
+
+          <p class="cupom__erro" id="cupom-erro" role="alert" hidden></p>
+
+          <button class="btn btn--principal btn--largo" type="button" id="btn-apostar">
+            Confirmar aposta
+          </button>
+          <button class="btn btn--texto btn--largo" type="button" id="btn-limpar-cupom">
+            Limpar cupom
+          </button>
+        </div>
+
+        <!-- Mensagem para quem estiver sem JavaScript -->
+        <noscript>
+          <p class="cupom__vazio">
+            O cupom de apostas precisa de JavaScript para calcular os retornos.
+            A lista de jogos e odds continua disponível ao lado.
+          </p>
+        </noscript>
+
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- ================== RODAPÉ ================== -->
+  <footer class="rodape">
+    <div class="rodape__interno">
+
+      <div class="rodape__marca">
+        <span class="logo logo--rodape">
+          <svg class="logo__raio" viewBox="0 0 32 32" width="24" height="24" aria-hidden="true" focusable="false">
+            <path d="M18 4 L8 18 h6 l-2 10 10-14 h-6 z" fill="currentColor"/>
+          </svg>
+          <span class="logo__texto">VOLT<span class="logo__destaque">BET</span></span>
+        </span>
+        <p>
+          Demonstração de front-end criada como peça de portfólio.
+          Não é uma casa de apostas: não recebe depósitos, não paga prêmios
+          e não possui licença — porque não opera de verdade.
+        </p>
+      </div>
+
+      <nav class="rodape__links" aria-label="Links institucionais">
+        <div>
+          <h3>Plataforma</h3>
+          <ul>
+            <li><a href="#ao-vivo">Ao vivo</a></li>
+            <li><a href="#futebol">Esportes</a></li>
+            <li><a href="#cassino">Cassino</a></li>
+            <li><a href="#historico">Minhas apostas</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Institucional</h3>
+          <ul>
+            <li><a href="#rodape-responsavel">Jogo responsável</a></li>
+            <li><a href="#rodape-responsavel">Termos de uso</a></li>
+            <li><a href="#rodape-responsavel">Privacidade</a></li>
+          </ul>
+        </div>
+      </nav>
+
+      <div class="rodape__responsavel" id="rodape-responsavel">
+        <span class="selo-18" aria-label="Proibido para menores de 18 anos">18+</span>
+        <div>
+          <h3>Jogo responsável</h3>
+          <p>
+            Apostas não são fonte de renda. Jogue apenas o que puder perder,
+            estabeleça limites de tempo e de valor, e nunca aposte para
+            recuperar prejuízo. Se o jogo deixou de ser diversão, procure ajuda:
+            <strong>Jogadores Anônimos — 0800 645 1010</strong> ou
+            <strong>CVV — 188</strong>.
+          </p>
+        </div>
+      </div>
+
+      <p class="rodape__creditos">
+        VOLTBET · Projeto fictício de portfólio · Desenvolvido por Bryan Eduardo Gouvea
+      </p>
+
+    </div>
+  </footer>
+
+  <!-- ================== PAINEL DE PERFIL ================== -->
+
+  <!-- Escurece a página quando o painel abre; clicar aqui fecha -->
+  <div class="fundo-escuro" id="fundo-perfil"></div>
+
+  <aside class="painel-perfil" id="painel-perfil" aria-labelledby="titulo-perfil">
+
+    <header class="painel-perfil__topo">
+      <div class="painel-perfil__identidade">
+        <span class="avatar avatar--grande" aria-hidden="true">
+          <span class="avatar__iniciais">BG</span>
+        </span>
+        <div>
+          <h2 class="painel-perfil__nome" id="titulo-perfil">Bryan Gouvea</h2>
+          <span class="painel-perfil__conta">Conta demo · VB-2026-0413</span>
+        </div>
+      </div>
+      <button class="painel-perfil__fechar" type="button" id="btn-fechar-perfil"
+              aria-label="Fechar painel de perfil">&times;</button>
+    </header>
+
+    <div class="painel-perfil__corpo">
+
+      <!-- Saldo -->
+      <section class="painel-bloco painel-bloco--saldo">
+        <span class="painel-bloco__rotulo">Saldo disponível</span>
+        <strong class="painel-bloco__saldo" id="perfil-saldo">R$&nbsp;500,00</strong>
+        <a class="btn btn--principal btn--largo" href="recarregar.html">
+          Recarregar saldo
+        </a>
+      </section>
+
+      <!-- Estatísticas vindas do histórico -->
+      <section class="painel-bloco">
+        <h3 class="painel-bloco__titulo">Minha atividade</h3>
+        <dl class="estatisticas">
+          <div class="estatistica">
+            <dt>Apostas feitas</dt>
+            <dd id="perfil-apostas">0</dd>
+          </div>
+          <div class="estatistica">
+            <dt>Total apostado</dt>
+            <dd id="perfil-total-apostado">R$&nbsp;0,00</dd>
+          </div>
+          <div class="estatistica">
+            <dt>Retorno potencial</dt>
+            <dd class="estatistica--verde" id="perfil-retorno">R$&nbsp;0,00</dd>
+          </div>
+          <div class="estatistica">
+            <dt>Maior odd</dt>
+            <dd id="perfil-maior-odd">—</dd>
+          </div>
+          <div class="estatistica">
+            <dt>Múltiplas</dt>
+            <dd id="perfil-multiplas">0</dd>
+          </div>
+        </dl>
+      </section>
+
+      <!-- Limite de depósito: exigência de jogo responsável -->
+      <section class="painel-bloco">
+        <h3 class="painel-bloco__titulo">
+          Limite mensal de depósito
+          <span class="etiqueta-mini">Jogo responsável</span>
+        </h3>
+
+        <div class="barra" role="progressbar" aria-label="Depositado no mês"
+             aria-valuemin="0" aria-valuenow="0" aria-valuemax="2000">
+          <span class="barra__preenchimento" id="perfil-barra"></span>
+        </div>
+
+        <ul class="lista-dados">
+          <li><span>Depositado no mês</span><strong id="perfil-depositado">R$&nbsp;0,00</strong></li>
+          <li><span>Teto mensal</span><strong id="perfil-limite">R$&nbsp;2.000,00</strong></li>
+          <li><span>Ainda disponível</span><strong id="perfil-restante">R$&nbsp;2.000,00</strong></li>
+        </ul>
+
+        <p class="painel-bloco__nota">
+          O limite existe para você decidir com a cabeça fria o quanto pode
+          gastar — antes de estar no calor do jogo.
+        </p>
+      </section>
+
+      <!-- Ações -->
+      <section class="painel-bloco">
+        <button class="btn btn--contorno btn--largo" type="button" id="btn-zerar">
+          Zerar demonstração
+        </button>
+        <p class="painel-bloco__nota">
+          Apaga saldo, apostas e depósitos guardados neste navegador e volta
+          tudo ao estado inicial.
+        </p>
+      </section>
+
+    </div>
+  </aside>
+
+  <!-- ================== JOGO: AVIATOR (DEMONSTRAÇÃO JOGÁVEL) ================== -->
+
+  <!-- Escurece a página atrás do jogo; clicar aqui fecha -->
+  <div class="fundo-escuro" id="fundo-aviator"></div>
+
+  <div class="modal-jogo" id="modal-aviator" role="dialog" aria-modal="true"
+       aria-labelledby="titulo-modal-aviator" hidden>
+    <div class="modal-jogo__caixa">
+
+      <header class="modal-jogo__topo">
+        <h2 class="modal-jogo__titulo" id="titulo-modal-aviator">
+          ✈️ Aviator <span class="etiqueta-mini">Demo jogável</span>
+        </h2>
+        <button class="modal-jogo__fechar" type="button" id="btn-fechar-aviator"
+                aria-label="Fechar jogo">&times;</button>
+      </header>
+
+      <div class="aviator-jogo">
+
+        <div class="aviator-jogo__tela">
+          <svg class="aviator-jogo__grafico" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <path class="aviator-jogo__curva" id="av-curva" d="M0,100 L0,100" />
+          </svg>
+          <span class="aviator-jogo__aviao" id="av-aviao" aria-hidden="true">✈️</span>
+          <ul class="aviator-jogo__historico" id="av-historico" aria-label="Últimas rodadas"></ul>
+          <span class="aviator-jogo__multiplicador" id="av-multiplicador">1.00x</span>
+          <p class="aviator-jogo__status" id="av-status">Faça sua aposta para decolar</p>
+        </div>
+
+        <div class="aviator-jogo__controles">
+          <label class="campo" for="av-valor">
+            <span class="campo__rotulo">Valor da aposta (R$)</span>
+            <input class="campo__entrada" type="number" id="av-valor"
+                   min="1" step="1" value="10" inputmode="decimal" autocomplete="off">
+          </label>
+
+          <div class="atalhos-valor" role="group" aria-label="Valores rápidos">
+            <button class="atalho" type="button" data-valor="10">+10</button>
+            <button class="atalho" type="button" data-valor="25">+25</button>
+            <button class="atalho" type="button" data-valor="50">+50</button>
+          </div>
+
+          <button class="btn btn--principal btn--largo" type="button" id="av-apostar">
+            Apostar e decolar
+          </button>
+          <button class="btn btn--principal btn--largo aviator-jogo__retirar" type="button"
+                  id="av-retirar" hidden>
+            Retirar <span id="av-retirar-valor"></span>
+          </button>
+
+          <p class="painel-bloco__nota">
+            Demonstração: o saldo é fictício. Aposte, veja o multiplicador subir
+            e clique em <strong>Retirar</strong> antes de cair para ganhar
+            aposta × multiplicador. Se cair antes, a aposta se perde.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ================== JOGO: SLOT (Fortune Tiger / Ox / Rabbit / Sweet Bonanza) ================== -->
+
+  <div class="fundo-escuro" id="fundo-slot"></div>
+
+  <div class="modal-jogo" id="modal-slot" role="dialog" aria-modal="true"
+       aria-labelledby="titulo-modal-slot" hidden>
+    <div class="modal-jogo__caixa">
+
+      <header class="modal-jogo__topo">
+        <h2 class="modal-jogo__titulo" id="titulo-modal-slot">
+          <span id="slot-titulo-emoji" aria-hidden="true">🐯</span>
+          <span id="slot-titulo-nome">Fortune Tiger</span>
+          <span class="etiqueta-mini">Demo jogável</span>
+        </h2>
+        <button class="modal-jogo__fechar" type="button" id="btn-fechar-slot"
+                aria-label="Fechar jogo">&times;</button>
+      </header>
+
+      <div class="jogo-corpo">
+
+        <div class="jogo-tela slot-jogo__tela" id="slot-tela">
+          <div class="slot-jogo__rolos" id="slot-rolos">
+            <span class="slot-jogo__rolo">❔</span>
+            <span class="slot-jogo__rolo">❔</span>
+            <span class="slot-jogo__rolo">❔</span>
+          </div>
+          <p class="jogo-status" id="slot-status">Aposte e gire os rolos.</p>
+        </div>
+
+        <div class="jogo-controles">
+          <label class="campo" for="slot-valor">
+            <span class="campo__rotulo">Valor da aposta (R$)</span>
+            <input class="campo__entrada" type="number" id="slot-valor"
+                   min="1" step="1" value="10" inputmode="decimal" autocomplete="off">
+          </label>
+
+          <div class="atalhos-valor" role="group" aria-label="Valores rápidos">
+            <button class="atalho" type="button" data-valor="10">+10</button>
+            <button class="atalho" type="button" data-valor="25">+25</button>
+            <button class="atalho" type="button" data-valor="50">+50</button>
+          </div>
+
+          <button class="btn btn--principal btn--largo" type="button" id="slot-girar">
+            Girar
+          </button>
+
+          <p class="painel-bloco__nota" id="slot-paytable">
+            Três símbolos iguais pagam o valor da tabela. Dois símbolos iguais
+            devolvem uma parte da aposta.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ================== JOGO: MINES ================== -->
+
+  <div class="fundo-escuro" id="fundo-mines"></div>
+
+  <div class="modal-jogo" id="modal-mines" role="dialog" aria-modal="true"
+       aria-labelledby="titulo-modal-mines" hidden>
+    <div class="modal-jogo__caixa">
+
+      <header class="modal-jogo__topo">
+        <h2 class="modal-jogo__titulo" id="titulo-modal-mines">
+          💣 Mines <span class="etiqueta-mini">Demo jogável</span>
+        </h2>
+        <button class="modal-jogo__fechar" type="button" id="btn-fechar-mines"
+                aria-label="Fechar jogo">&times;</button>
+      </header>
+
+      <div class="jogo-corpo">
+
+        <div class="jogo-tela mines-jogo__tela" id="mines-tela">
+          <div class="mines-jogo__grade" id="mines-grade" role="group" aria-label="Campo minado"></div>
+          <p class="jogo-status" id="mines-status">3 bombas escondidas em 25 casas. Aposte para abrir o campo.</p>
+        </div>
+
+        <div class="jogo-controles">
+          <label class="campo" for="mines-valor">
+            <span class="campo__rotulo">Valor da aposta (R$)</span>
+            <input class="campo__entrada" type="number" id="mines-valor"
+                   min="1" step="1" value="10" inputmode="decimal" autocomplete="off">
+          </label>
+
+          <div class="atalhos-valor" role="group" aria-label="Valores rápidos">
+            <button class="atalho" type="button" data-valor="10">+10</button>
+            <button class="atalho" type="button" data-valor="25">+25</button>
+            <button class="atalho" type="button" data-valor="50">+50</button>
+          </div>
+
+          <button class="btn btn--principal btn--largo" type="button" id="mines-apostar">
+            Abrir campo
+          </button>
+          <button class="btn btn--principal btn--largo aviator-jogo__retirar" type="button"
+                  id="mines-retirar" hidden>
+            Retirar <span id="mines-retirar-valor"></span>
+          </button>
+
+          <p class="painel-bloco__nota">
+            Cada gema revelada aumenta o multiplicador. Clique em
+            <strong>Retirar</strong> quando quiser embolsar — mas se abrir uma
+            bomba, perde a aposta.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ================== JOGO: PLINKO ================== -->
+
+  <div class="fundo-escuro" id="fundo-plinko"></div>
+
+  <div class="modal-jogo" id="modal-plinko" role="dialog" aria-modal="true"
+       aria-labelledby="titulo-modal-plinko" hidden>
+    <div class="modal-jogo__caixa">
+
+      <header class="modal-jogo__topo">
+        <h2 class="modal-jogo__titulo" id="titulo-modal-plinko">
+          🔴 Plinko <span class="etiqueta-mini">Demo jogável</span>
+        </h2>
+        <button class="modal-jogo__fechar" type="button" id="btn-fechar-plinko"
+                aria-label="Fechar jogo">&times;</button>
+      </header>
+
+      <div class="jogo-corpo">
+
+        <div class="jogo-tela plinko-jogo__tela" id="plinko-tela">
+          <div class="plinko-jogo__pinos" id="plinko-pinos" aria-hidden="true"></div>
+          <span class="plinko-jogo__bolinha" id="plinko-bolinha" aria-hidden="true"></span>
+          <div class="plinko-jogo__slots" id="plinko-slots"></div>
+          <p class="jogo-status" id="plinko-status">Aposte e solte a bolinha.</p>
+        </div>
+
+        <div class="jogo-controles">
+          <label class="campo" for="plinko-valor">
+            <span class="campo__rotulo">Valor da aposta (R$)</span>
+            <input class="campo__entrada" type="number" id="plinko-valor"
+                   min="1" step="1" value="10" inputmode="decimal" autocomplete="off">
+          </label>
+
+          <div class="atalhos-valor" role="group" aria-label="Valores rápidos">
+            <button class="atalho" type="button" data-valor="10">+10</button>
+            <button class="atalho" type="button" data-valor="25">+25</button>
+            <button class="atalho" type="button" data-valor="50">+50</button>
+          </div>
+
+          <button class="btn btn--principal btn--largo" type="button" id="plinko-soltar">
+            Soltar bolinha
+          </button>
+
+          <p class="painel-bloco__nota">
+            A bolinha cai sozinha pelos pinos. O slot em que ela parar decide o
+            multiplicador — os cantos pagam muito mais que o meio.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ================== JOGO: ROLETA BRASILEIRA ================== -->
+
+  <div class="fundo-escuro" id="fundo-roleta"></div>
+
+  <div class="modal-jogo" id="modal-roleta" role="dialog" aria-modal="true"
+       aria-labelledby="titulo-modal-roleta" hidden>
+    <div class="modal-jogo__caixa">
+
+      <header class="modal-jogo__topo">
+        <h2 class="modal-jogo__titulo" id="titulo-modal-roleta">
+          🎡 Roleta Brasileira <span class="etiqueta-mini">Demo jogável</span>
+        </h2>
+        <button class="modal-jogo__fechar" type="button" id="btn-fechar-roleta"
+                aria-label="Fechar jogo">&times;</button>
+      </header>
+
+      <div class="jogo-corpo">
+
+        <div class="jogo-tela roleta-jogo__tela" id="roleta-tela">
+          <div class="roleta-jogo__janela">
+            <ul class="roleta-jogo__faixa" id="roleta-faixa"></ul>
+          </div>
+          <p class="jogo-status" id="roleta-status">Escolha a cor e gire a roleta.</p>
+        </div>
+
+        <div class="jogo-controles">
+          <label class="campo" for="roleta-valor">
+            <span class="campo__rotulo">Valor da aposta (R$)</span>
+            <input class="campo__entrada" type="number" id="roleta-valor"
+                   min="1" step="1" value="10" inputmode="decimal" autocomplete="off">
+          </label>
+
+          <div class="roleta-jogo__cores" role="group" aria-label="Cor da aposta" id="roleta-cores">
+            <button class="roleta-jogo__cor roleta-jogo__cor--vermelho" type="button" data-cor="vermelho">
+              Vermelho <span>2x</span>
+            </button>
+            <button class="roleta-jogo__cor roleta-jogo__cor--preto" type="button" data-cor="preto">
+              Preto <span>2x</span>
+            </button>
+            <button class="roleta-jogo__cor roleta-jogo__cor--verde" type="button" data-cor="verde">
+              Verde (0) <span>36x</span>
+            </button>
+          </div>
+
+          <button class="btn btn--principal btn--largo" type="button" id="roleta-girar">
+            Girar
+          </button>
+
+          <p class="painel-bloco__nota">
+            Escolha vermelho, preto ou o verde (número 0) antes de girar. A
+            bolinha decide sozinha onde parar.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Avisos curtos (confirmação de aposta). aria-live para leitores de tela. -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="js/comum.js" defer></script>
+  <script src="js/fundo.js" defer></script>
+  <script src="js/perfil.js" defer></script>
+  <script src="js/script.js" defer></script>
+  <script src="js/aviator.js" defer></script>
+  <script src="js/slot.js" defer></script>
+  <script src="js/mines.js" defer></script>
+  <script src="js/plinko.js" defer></script>
+  <script src="js/roleta.js" defer></script>
+</body>
+</html>

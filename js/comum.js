@@ -19,7 +19,7 @@ window.VOLTBET = (function () {
     depositos: "voltbet:depositos"
   };
 
-  const SALDO_INICIAL = 1000000000;
+  const SALDO_INICIAL = 1000;
 
   // Jogo responsável: teto de quanto pode ser depositado no mês.
   // Casas de apostas de verdade são obrigadas a oferecer um limite assim.
